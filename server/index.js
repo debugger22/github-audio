@@ -101,23 +101,63 @@ function fetchDataFromGithub(){
     }
   })
 
-  setTimeout(fetchDataFromGithub, 1000);
+  setTimeout(fetchDataFromGithub, 2000);
 }
 
-setTimeout(fetchDataFromGithub, 1000);
+setTimeout(fetchDataFromGithub, 2000);
 
 
 function stripData(data){
   var stripedData = [];
   data.forEach(function(data){
-    if(data.type = 'PushEvent'){
+    if(data.type == 'PushEvent'){
+      if(data.payload.size != 0){
+        stripedData.push({
+          'id': data.id,
+          'type': data.type,
+          'user': data.actor.display_login,
+          'user_avatar': data.actor.avatar_url + 'v=3&s=64',
+          'repo_id': data.repo.id,
+          'repo_name': data.repo.name,
+          'payload_size': data.payload.size,
+          'message': data.payload.commits[0].message,
+          'created': data.created_at
+        });
+      }
+    }else if(data.type == 'IssueCommentEvent'){
       stripedData.push({
         'id': data.id,
         'type': data.type,
         'user': data.actor.display_login,
         'user_avatar': data.actor.avatar_url + 'v=3&s=64',
+        'repo_id': data.repo.id,
         'repo_name': data.repo.name,
-        'payload_size': data.payload.size,
+        'payload_size': 0,
+        'message': data.body,
+        'created': data.created_at
+      });
+    }else if(data.type == 'PullRequestEvent'){
+      stripedData.push({
+        'id': data.id,
+        'type': data.type,
+        'user': data.actor.display_login,
+        'user_avatar': data.actor.avatar_url + 'v=3&s=64',
+        'repo_id': data.repo.id,
+        'repo_name': data.repo.name,
+        'action': data.payload.action,  // opened, reopened, closed, merged
+        'message': data.payload.pull_request.title,
+        'created': data.created_at
+      });
+    }else if(data.type == 'IssuesEvent'){
+      stripedData.push({
+        'id': data.id,
+        'type': data.type,
+        'user': data.actor.display_login,
+        'user_avatar': data.actor.avatar_url + 'v=3&s=64',
+        'repo_id': data.repo.id,
+        'repo_name': data.repo.name,
+        'action': data.payload.action,  // opened, reopened, closed, merged
+        'message': data.payload.issue.title,
         'created': data.created_at
       });
     }
