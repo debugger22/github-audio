@@ -22,6 +22,8 @@
   "homepage": "https://github.com/debugger22/github-audio#readme",
   "dependencies": {
     "express": "^4.14.0",
+    "node-redis": "^0.1.7",
+    "redis": "^2.6.2",
     "request": "^2.75.0",
     "socket.io": "^1.4.8"
   }
