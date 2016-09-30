@@ -38,10 +38,29 @@ app.get('/', function (req, res) {
   res.sendFile(path.resolve('app/index.html'));
 });
 
+// Set number of connected users to 0
+redis_client.set('connected_users', 0);
+
+
+
+
+ var allClients = [];
 
 // When a socket connection is created
 io.on('connection', function (socket) {
-
+  allClients.push(socket);
+  redis_client.incr('connected_users');
+  socket.on('disconnect', function() {
+     logger.v('Got disconnect!');
+     var i = allClients.indexOf(socket);
+     allClients.splice(i, 1);
+     redis_client.decr('connected_users');
+  });
+  socket.on('error', function(){
+    logger.error('Got errored!');
+    redis_client.decr('connected_users');
+  })
+});
 
 // Function to get events from GitHub API
 function fetchDataFromGithub(){
@@ -54,16 +73,46 @@ function fetchDataFromGithub(){
   };
   request(options, function (error, response, body) {
     if (!error && response.statusCode == 200) {
-      socket.emit('github', body);
+      var data = JSON.parse(body);
+      var stripedData = stripData(data);  // Keep only useful keys
+      allClients.forEach(function(socket){
+        if(socket != null && socket.connected == true){
+            redis_client.get('connected_users', function(err, count) {
+                if(!err && count != null){
+                    socket.json.emit('github', {data: stripedData, connected_users: count});
+                }else{
+                  logger.error(err.message);
+                }
+            });
+
+        }
+      });
+
     }else{
-      logger.d("GitHib request: " + options.headers.Authorization);
       logger.error("GitHub status code: " + response.statusCode);
     }
   })
 
-  setTimeout(fetchDataFromGithub, 2000);
+  setTimeout(fetchDataFromGithub, 1000);
 }
 
-setTimeout(fetchDataFromGithub, 2000);
+setTimeout(fetchDataFromGithub, 1000);
 
-});
+
+function stripData(data){
+  var stripedData = [];
+  data.forEach(function(data){
+    if(data.type = 'PushEvent'){
+      stripedData.push({
+        'id': data.id,
+        'type': data.type,
+        'user': data.actor.display_login,
+        'user_avatar': data.actor.avatar_url + 'v=3&s=64',
+        'repo_name': data.repo.name,
+        'payload_size': data.payload.size,
+        'created': data.created_at
+      });
+    }
+  });
+  return stripedData;
+}

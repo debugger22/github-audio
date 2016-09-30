@@ -45,7 +45,7 @@ Run server
 ----------
 
 ```bash
-$ node app/server.js
+$ node server
 ```
 
 Note: For production run `export NODE_ENV="production"` before starting the server.
