@@ -40,8 +40,8 @@ app.get('/', function (req, res) {
   res.sendFile(path.resolve('app/index.html'));
 });
 
-// Remove x-powered-by header
-app.disable('x-powered-by');
+// Apply security middlewares
+app.use(helmet());
 
 // Set number of connected users to 0
 redis_client.set('connected_users', 0);
