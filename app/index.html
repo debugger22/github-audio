@@ -16,8 +16,7 @@
     <script type="text/babel">
     </script>
     <script>
-      var url = window.location.href;
-  
+      var url = document.location.hostname;
       var socket = io(url + ":8000");
       socket.on('github', function (data) {
         document.write(data);
