@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env nodejs
 
 var request = require("request");  // To make HTTP requests at the server side
 var app = require('express')();
