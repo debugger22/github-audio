@@ -7,6 +7,8 @@ var request = require("request");  // To make HTTP requests at the server side
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
 
+var helmet = require('helmet');  // To change response headers
+
 // To temporarily store JSON data from GitHub and also
 // the number of connected users
 var redis = require("redis"),
@@ -37,6 +39,9 @@ app.use('/static', express.static('app'));
 app.get('/', function (req, res) {
   res.sendFile(path.resolve('app/index.html'));
 });
+
+// Remove x-powered-by header
+app.disable('x-powered-by');
 
 // Set number of connected users to 0
 redis_client.set('connected_users', 0);
