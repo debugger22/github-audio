@@ -17,7 +17,7 @@
     </script>
     <script>
       var url = document.location.hostname.split("//")[0];
-      var socket = io("http://" + url + ":8000");
+      var socket = io("http://" + url);
       socket.on('github', function (data) {
         document.write(data);
         console.log(data);
