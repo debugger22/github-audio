@@ -1,6 +1,7 @@
 #!/usr/bin/env nodejs
 
-var app = require('express')();
+var express = require('express');
+var app = express();
 var request = require("request");  // To make HTTP requests at the server side
 
 var server = require('http').Server(app);
@@ -17,8 +18,8 @@ const logger = require('./logger');
 const argv = require('minimist')(process.argv.slice(2));
 const isDev = process.env.NODE_ENV !== 'production';
 
-// Get the intended port number, use port 8000 if not provided
-const port = argv.port || process.env.PORT || 8000;
+// Get the intended port number, use port 80 if not provided
+const port = argv.port || process.env.PORT || 80;
 server.listen(port, (err) => {
   if(err){
     return logger.error(err.message);
@@ -28,6 +29,9 @@ if(isDev)
   logger.appStarted(port, 'http://localhost');
 else
   logger.appStarted(port);
+
+// server static files
+app.use('/static', express.static('app'));
 
 // Load main web page
 app.get('/', function (req, res) {
