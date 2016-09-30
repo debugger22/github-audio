@@ -18,8 +18,8 @@ const logger = require('./logger');
 const argv = require('minimist')(process.argv.slice(2));
 const isDev = process.env.NODE_ENV !== 'production';
 
-// Get the intended port number, use port 80 if not provided
-const port = argv.port || process.env.PORT || 80;
+// Get the intended port number, use port 8000 if not provided
+const port = argv.port || process.env.PORT || 8000;
 server.listen(port, (err) => {
   if(err){
     return logger.error(err.message);
