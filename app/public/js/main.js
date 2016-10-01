@@ -167,7 +167,7 @@ $(function(){
       $('#cmdMute').attr('src', '/static/public/images/speaker-muted.svg');
     }
   });
-  Howler.volume(1);
+  Howler.volume(0.6);
 
 });
 
