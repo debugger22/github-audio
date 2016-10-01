@@ -30,9 +30,8 @@ var svg_background_color_online = '#0288D1',
 
 
 
-var socket = io(document.location.hostname + ":8000");
+var socket = io(document.location.hostname);
 socket.on('github', function (data) {
-  // $('#active-nerds-value').html(data.connected_users);
   $('.online-users-count').html(data.connected_users);
   data.data.forEach(function(event){
     if(!isEventInQueue(event)){
