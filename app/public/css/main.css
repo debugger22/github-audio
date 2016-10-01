@@ -1,4 +1,4 @@
-@import 'https://fonts.googleapis.com/css?family=Pavanam|Source+Sans+Pro';
+@import 'https://fonts.googleapis.com/css?family=Source+Sans+Pro';
 
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -44,9 +44,14 @@ table {
 	border-spacing: 0;
 }
 
+a{
+	text-decoration: none;
+	color: #0091EA;
+}
+
 html,body{
 	background-color: white;
-	font-family: 'Pavanam', sans-serif;
+	font-family: 'Source Sans Pro', sans-serif;
 	font-size: 16px;
 }
 
@@ -54,16 +59,32 @@ header{
   position: relative;;
   width: 100%;
   height: 35px;
-  background: #673AB7;
   color: #fff;
   font-family: 'Source Sans Pro', sans-serif;
-	padding: 20px;
+	padding-left: 20px;
+	padding-top: 20px;
+	padding-bottom: 20px;
 }
 
 .header-text{
 	float: left;
 	font-size: 2em;
 	line-height: 1em;
+}
+
+.offline-text{
+	font-size: 0.4em;
+	visibility: hidden;
+}
+
+.events-remaining{
+	float:right;
+	margin-right: 3%;
+}
+
+.events-remaining-text, .events-remaining-value{
+	font-size: 0.8em;
+	visibility: visible;
 }
 
 .active-nerds{
@@ -75,13 +96,14 @@ header{
 #area{
 	width: 100%;
 	overflow: hidden;
+	position: relative;
 }
 
 circle {
-    fill-opacity: 0.5;
+    fill-opacity: 0.8;
 }
 
-.article-label {
+.label {
     font: 1.0em 'Source Sans Pro', sans-serif;
     text-shadow:1px 1px 0 rgb(28, 39, 51),
     -1px -1px 0 rgb(28, 39, 51),
@@ -91,4 +113,40 @@ circle {
     1px 0px 0 rgb(28, 39, 51),
     0px -1px 0 rgb(28, 39, 51),
     -1px 0px 0 rgb(28, 39, 51);
+}
+
+.online-users-div{
+	/*padding-top: 100px;*/
+	/*padding-bottom: 100px;*/
+	text-align: center;
+	position: fixed;
+	bottom: 20px;
+	width: 100%;
+	margin: 0 auto;
+}
+
+.online-users-text{
+	font-family: 'Source Sans Pro', sans-serif;
+	font-size: 1em;
+	color: #E0E0E0;
+}
+
+.possibly-text{
+	visibility: false;
+}
+
+footer{
+	width: 100%;
+	height: 200px;
+	padding: 20px;
+	background-color: #242729;
+	color: #9FA6AD;
+	margin-top: -5px;
+	position: relative;
+}
+
+.social-buttons{
+	position: fixed;
+	bottom:20px;
+	right:20px;
 }
