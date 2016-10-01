@@ -121,7 +121,6 @@ circle {
 	width: 100%;
 	margin: 0 auto;
 	z-index: 1;
-	visibility: hidden;
 }
 
 .online-users-text{
