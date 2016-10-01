@@ -134,12 +134,14 @@ $(function(){
                   'static/public/sounds/celesta/' + fn + '.mp3'],
           volume : 0.7,
           onload : sound_load(),
+          buffer: true,
       }))
       clav.push(new Howl({
           src : ['static/public/sounds/clav/' + fn + '.ogg',
                   'static/public/sounds/clav/' + fn + '.mp3'],
           volume : 0.4,
           onload : sound_load(),
+          buffer: true,
       }))
   }
 
@@ -149,6 +151,7 @@ $(function(){
                   'static/public/sounds/swells/swell' + i + '.mp3'],
           volume : 1,
           onload : sound_load(),
+          buffer: true,
       }));
   }
 
