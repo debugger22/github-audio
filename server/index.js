@@ -92,7 +92,6 @@ function fetchDataFromGithub(){
                   logger.error(err.message);
                 }
             });
-
         }
       });
 
@@ -100,17 +99,19 @@ function fetchDataFromGithub(){
       logger.error("GitHub status code: " + response.statusCode);
     }
   })
-
   setTimeout(fetchDataFromGithub, 2000);
 }
-
 setTimeout(fetchDataFromGithub, 2000);
 
 
 function stripData(data){
   var stripedData = [];
+  var pushEventCounter = 0;
+  var IssueCommentEventCounter = 0;
+  var IssuesEventCounter = 0;
   data.forEach(function(data){
     if(data.type == 'PushEvent'){
+      if(pushEventCounter > 3) return;
       if(data.payload.size != 0){
         stripedData.push({
           'id': data.id,
@@ -123,8 +124,10 @@ function stripData(data){
           'message': data.payload.commits[0].message,
           'created': data.created_at
         });
+        pushEventCounter++;
       }
     }else if(data.type == 'IssueCommentEvent'){
+      if(IssueCommentEventCounter > 5) return;
       stripedData.push({
         'id': data.id,
         'type': data.type,
@@ -136,6 +139,7 @@ function stripData(data){
         'message': data.body,
         'created': data.created_at
       });
+      IssueCommentEventCounter++;
     }else if(data.type == 'PullRequestEvent'){
       stripedData.push({
         'id': data.id,
@@ -149,6 +153,7 @@ function stripData(data){
         'created': data.created_at
       });
     }else if(data.type == 'IssuesEvent'){
+      if(IssuesEventCounter > 3) return;
       stripedData.push({
         'id': data.id,
         'type': data.type,
@@ -160,6 +165,7 @@ function stripData(data){
         'message': data.payload.issue.title,
         'created': data.created_at
       });
+      IssuesEventCounter++;
     }
   });
   return stripedData;
