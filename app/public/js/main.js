@@ -11,7 +11,7 @@ var scale_factor = 9,
     current_notes = 0,
     max_life = 20000;
 
-var svg_background_color_online = '#FF5722',
+var svg_background_color_online = '#0288D1',
     svg_background_color_offline = '#E91E63'
     svg_text_color = '#FFFFFF',
     newuser_box_color = 'rgb(41, 128, 185)',
@@ -30,7 +30,7 @@ var svg_background_color_online = '#FF5722',
 
 
 
-var socket = io(document.location.hostname);
+var socket = io(document.location.hostname + ":8000");
 socket.on('github', function (data) {
   // $('#active-nerds-value').html(data.connected_users);
   $('.online-users-count').html(data.connected_users);
@@ -133,13 +133,13 @@ $(function(){
       celesta.push(new Howl({
           src : ['static/public/sounds/celesta/' + fn + '.ogg',
                   'static/public/sounds/celesta/' + fn + '.mp3'],
-          volume : 0.3,
+          volume : 0.7,
           onload : sound_load(),
       }))
       clav.push(new Howl({
           src : ['static/public/sounds/clav/' + fn + '.ogg',
                   'static/public/sounds/clav/' + fn + '.mp3'],
-          volume : 0.3,
+          volume : 0.4,
           onload : sound_load(),
       }))
   }
@@ -180,9 +180,9 @@ function playSound(size, type) {
     if (current_notes < note_overlap) {
         current_notes++;
         if (type == 'IssuesEvent' || type == 'IssueCommentEvent') {
-            celesta[index].play();
-        } else if(type == 'PushEvent') {
             clav[index].play();
+        } else if(type == 'PushEvent') {
+            celesta[index].play();
         }else{
           playRandomSwell();
         }
@@ -252,7 +252,7 @@ function drawEvent(data, svg_area) {
       break;
       case "IssueCommentEvent":
         label_text = data.user.capitalize() + " commented in " + data.repo_name;
-        edit_color = '#FFEB3B';
+        edit_color = '#FF5722';
       break;
     }
     var csize = size;
