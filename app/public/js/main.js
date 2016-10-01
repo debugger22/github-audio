@@ -2,6 +2,11 @@ var mute = false;
 var volume = 50;
 
 var eventQueue = [];
+var svg;
+var element;
+var drawingArea;
+var width;
+var height;
 
 var socket = io(document.location.hostname);
 socket.on('github', function (data) {
@@ -11,6 +16,8 @@ socket.on('github', function (data) {
       eventQueue.push(event);
     }
   });
+  // Don't let the eventQueue grow more than 50
+  if (eventQueue.length > 50) eventQueue = eventQueue.slice(0, 50);
   console.log("Current queue size: " + eventQueue.length);
 });
 
@@ -32,17 +39,19 @@ function isEventInQueue(event){
   return false;
 }
 
-var scale_factor = 5,
+var scale_factor = 7,
     note_overlap = 15,
     note_timeout = 300,
     current_notes = 0,
-    max_life = 60000;
+    max_life = 20000;
 
-var svg_background_color = '#ffffff',
+var svg_background_color = '#FFFF00',
     svg_text_color = '#000',
     newuser_box_color = 'rgb(41, 128, 185)',
-    bot_color = 'rgb(155, 89, 182)',
-    anon_color = 'rgb(46, 204, 113)',
+    push_color = 'rgb(155, 89, 182)',
+    issue_color = 'rgb(46, 204, 113)',
+    pull_request_color = 'rgb(46, 204, 113)',
+    comment_color = 'rgb(46, 204, 113)'
     edit_color = '#fff',
     total_sounds = 51,
     total_edits = 0;
@@ -56,12 +65,12 @@ var svg_background_color = '#ffffff',
 $(function(){
   element = document.documentElement;
   drawingArea = document.getElementsByTagName('#area')[0];
-  var width = window.innerWidth || element.clientWidth || drawingArea.clientWidth;
-  var height = (window.innerHeight  - $('header').height())|| (element.clientHeight - $('header').height()) || (drawingArea.clientHeight - $('header').height());
+  width = window.innerWidth || element.clientWidth || drawingArea.clientWidth;
+  height = (window.innerHeight  - $('header').height())|| (element.clientHeight - $('header').height()) || (drawingArea.clientHeight - $('header').height());
   $('svg').css('background-color', svg_background_color);
   $('svg text').css('color', svg_text_color);
 
-  var svg = d3.select("#area").append("svg");
+  svg = d3.select("#area").append("svg");
   svg.attr({width: width, height: height});
   svg.style('background-color', svg_background_color);
 
@@ -80,11 +89,9 @@ $(function(){
       if (loaded_sounds == total_sounds) {
           all_loaded = true;
           console.log('Sound loading complete');
-          setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 800) + 500);
-          setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 1200) + 700);
-          setTimeout(playFromQueueExchange3, Math.floor(Math.random() * 1400) + 1200);
-          //setTimeout(playFromQueueExchange4, Math.floor(Math.random() * 1600) + 1400);
-          //setTimeout(playFromQueueExchange5, Math.floor(Math.random() * 1800) + 1600);
+          setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1000));
+          setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 2000));
+          //setTimeout(playFromQueueExchange3, Math.floor(Math.random() * 3000));
       }
   }
 
@@ -163,40 +170,113 @@ function playSound(size, type, volume) {
 
 function playFromQueueExchange1(){
   var event = eventQueue.shift();
-  if(event != null && event.message != null){
-    playSound(event.message.length, event.type, 0.5);
+  if(event != null && event.message != null && svg != null){
+    playSound(event.message.length*1.1, event.type, 1);
+    drawEvent(event, svg);
   }
-  setTimeout(playFromQueueExchange1, 1000);
+  setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1800) + 600);
 }
 
 function playFromQueueExchange2(){
   var event = eventQueue.shift();
-  if(event != null && event.message != null){
+  if(event != null && event.message != null && svg != null){
     playSound(event.message.length, event.type, 0.7);
+    drawEvent(event, svg);
   }
-  setTimeout(playFromQueueExchange2, 1000);
+  setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 1000) + 500);
 }
 
 function playFromQueueExchange3(){
   var event = eventQueue.shift();
-  if(event != null && event.message != null){
+  if(event != null && event.message != null && svg != null){
     playSound(event.message.length, event.type, 1);
+    drawEvent(event, svg);
   }
-  setTimeout(playFromQueueExchange3, 1000);
+  setTimeout(playFromQueueExchange3, Math.floor(Math.random() * 2000) + 0);
 }
 
-function playFromQueueExchange4(){
-  var event = eventQueue.shift();
-  if(event != null && event.message != null){
-    playSound(event.message.length, event.type, 0.2);
-  }
-  setTimeout(playFromQueueExchange4, 1000);
-}
 
-function playFromQueueExchange5(){
-  var event = eventQueue.shift();
-  if(event != null && event.message != null){
-    playSound(event.message.length, event.type, 1);
-  }
-  setTimeout(playFromQueueExchange5, 1000);
+
+function drawEvent(data, svg_area) {
+    var starting_opacity = 1;
+    var opacity = 1 / (100 / data.message.length);
+    if (opacity > 0.5) {
+        opacity = 0.5;
+    }
+
+    var size = data.message.length;
+    var label_text = data.user;
+    var csize = size;
+    var no_label = false;
+    var type = data.type;
+
+    var circle_id = 'd' + ((Math.random() * 100000) | 0);
+    var abs_size = Math.abs(size);
+    size = Math.max(Math.sqrt(abs_size) * scale_factor, 3);
+
+    Math.seedrandom(data.message)
+    var x = Math.random() * (width - size) + size;
+    var y = Math.random() * (height - size) + size;
+
+
+    var circle_group = svg_area.append('g')
+        .attr('transform', 'translate(' + x + ', ' + y + ')')
+        .attr('fill', edit_color)
+        .style('opacity', starting_opacity)
+
+    console.log(circle_group);
+
+    var ring = circle_group.append('circle');
+    ring.attr({r: size + 20, stroke: 'none'});
+    ring.transition()
+         .attr('r', size + 40)
+         .style('opacity', 0)
+         .ease(Math.sqrt)
+         .duration(2500);
+    ring.remove();
+
+    var circle_container = circle_group.append('a');
+    circle_container.attr('xlink:href', 'https://github.com/' + data.user);
+    circle_container.attr('target', '_blank');
+    circle_container.attr('fill', svg_text_color);
+
+    var circle = circle_container.append('circle');
+    circle.classed(type, true);
+    circle.attr('r', size)
+      .transition()
+      .duration(max_life)
+      .style('opacity', 0)
+    //circle.each('end', function(){
+    //        circle_group.remove();
+    //})
+      .remove();
+
+
+    circle_container.on('mouseover', function() {
+        if (no_label) {
+            no_label = false;
+            circle_container.append('text')
+                .text(label_text)
+                .classed('article-label', true)
+                .attr('text-anchor', 'middle')
+                .transition()
+                .delay(1000)
+                .style('opacity', 0)
+                .duration(2000)
+                .each('end', function() { no_label = true; })
+                .remove();
+        }
+
+    });
+
+    var text = circle_container.append('text')
+        .text(label_text)
+        .classed('article-label', true)
+        .attr('text-anchor', 'middle')
+        .transition()
+        .delay(1000)
+        .style('opacity', 0)
+        .duration(2000)
+        //.each('end', function() { no_label = true; })
+        .remove();
 }
