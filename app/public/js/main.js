@@ -4,6 +4,7 @@ var element;
 var drawingArea;
 var width;
 var height;
+var mute = false;
 
 var scale_factor = 9,
     note_overlap = 15,
@@ -155,6 +156,19 @@ $(function(){
       }));
   }
 
+  $('#cmdMute').click(function(){
+    if(mute == true){
+      mute = false;
+      Howler.mute(mute);
+      $('#cmdMute').attr('src', '/static/public/images/speaker.svg');
+    }else{
+      mute = true;
+      Howler.mute(mute);
+      $('#cmdMute').attr('src', '/static/public/images/speaker-muted.svg');
+    }
+  });
+  Howler.volume(1);
+
 });
 
 
@@ -200,7 +214,8 @@ function playSound(size, type) {
 function playFromQueueExchange1(){
   var event = eventQueue.shift();
   if(event != null && event.message != null && svg != null){
-    playSound(event.message.length*1.1, event.type);
+    if(!mute)
+      playSound(event.message.length*1.1, event.type);
     if(!document.hidden)
       drawEvent(event, svg);
   }
@@ -211,7 +226,8 @@ function playFromQueueExchange1(){
 function playFromQueueExchange2(){
   var event = eventQueue.shift();
   if(event != null && event.message != null && svg != null){
-    playSound(event.message.length, event.type);
+    if(!mute)
+      playSound(event.message.length, event.type);
     if(!document.hidden)
       drawEvent(event, svg);
   }
