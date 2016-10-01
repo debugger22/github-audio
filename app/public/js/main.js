@@ -1,6 +1,3 @@
-var mute = false;
-var volume = 50;
-
 var eventQueue = [];
 var svg;
 var element;
@@ -8,43 +5,14 @@ var drawingArea;
 var width;
 var height;
 
-var socket = io(document.location.hostname);
-socket.on('github', function (data) {
-  $('#active-nerds-value').html(data.connected_users);
-  data.data.forEach(function(event){
-    if(!isEventInQueue(event)){
-      eventQueue.push(event);
-    }
-  });
-  // Don't let the eventQueue grow more than 50
-  if (eventQueue.length > 50) eventQueue = eventQueue.slice(0, 50);
-});
-
-$(function(){
-
-//  Howler.volume(volume * .01);
-
-});
-
-
-/**
-* This function checks whether an event is already in the queue
-*/
-function isEventInQueue(event){
-  for(var i=0; i<eventQueue.length; i++){
-    if(eventQueue[i].id == event.id)
-      return true;
-  }
-  return false;
-}
-
 var scale_factor = 9,
     note_overlap = 15,
     note_timeout = 300,
     current_notes = 0,
     max_life = 20000;
 
-var svg_background_color = '#673AB7',
+var svg_background_color_online = '#FF5722',
+    svg_background_color_offline = '#E91E63'
     svg_text_color = '#FFFFFF',
     newuser_box_color = 'rgb(41, 128, 185)',
     push_color = 'rgb(155, 89, 182)',
@@ -61,17 +29,79 @@ var svg_background_color = '#673AB7',
         all_loaded = false;
 
 
+
+var socket = io(document.location.hostname);
+socket.on('github', function (data) {
+  // $('#active-nerds-value').html(data.connected_users);
+  $('.online-users-count').html(data.connected_users);
+  data.data.forEach(function(event){
+    if(!isEventInQueue(event)){
+      eventQueue.push(event);
+    }
+  });
+  // Don't let the eventQueue grow more than 50
+  if (eventQueue.length > 50) eventQueue = eventQueue.slice(0, 50);
+});
+
+socket.on('connect', function(){
+    if(svg != null){
+      $('svg').css('background-color', svg_background_color_online);
+      $('header').css('background-color', svg_background_color_online);
+      $('.offline-text').css('visibility', 'hidden');
+      $('.events-remaining-text').css('visibility', 'hidden');
+      $('.events-remaining-value').css('visibility', 'hidden');
+      $('.possibly-text').css('visibility', 'hidden');
+    }
+});
+
+socket.on('disconnect', function(){
+    if(svg != null){
+      $('svg').css('background-color', svg_background_color_offline);
+      $('header').css('background-color', svg_background_color_offline);
+      $('.offline-text').css('visibility', 'visible');
+      $('.events-remaining-text').css('visibility', 'visible');
+      $('.events-remaining-value').css('visibility', 'visible');
+      $('.possibly-text').css('visibility', 'visible');
+
+    }
+});
+
+socket.on('error', function(){
+    if(svg != null){
+      $('svg').css('background-color', svg_background_color_offline);
+      $('header').css('background-color', svg_background_color_offline);
+      $('.offline-text').css('visibility', 'visible');
+      $('.events-remaining-text').css('visibility', 'visible');
+      $('.events-remaining-value').css('visibility', 'visible');
+      $('.possibly-text').css('visibility', 'visible');
+    }
+});
+
+
+/**
+* This function checks whether an event is already in the queue
+*/
+function isEventInQueue(event){
+  for(var i=0; i<eventQueue.length; i++){
+    if(eventQueue[i].id == event.id)
+      return true;
+  }
+  return false;
+}
+
 $(function(){
   element = document.documentElement;
   drawingArea = document.getElementsByTagName('#area')[0];
   width = window.innerWidth || element.clientWidth || drawingArea.clientWidth;
   height = (window.innerHeight  - $('header').height())|| (element.clientHeight - $('header').height()) || (drawingArea.clientHeight - $('header').height());
-  $('svg').css('background-color', svg_background_color);
+  $('svg').css('background-color', svg_background_color_online);
+  $('header').css('background-color', svg_background_color_online);
   $('svg text').css('color', svg_text_color);
 
+  // Main drawing area
   svg = d3.select("#area").append("svg");
   svg.attr({width: width, height: height});
-  svg.style('background-color', svg_background_color);
+  svg.style('background-color', svg_background_color_online);
 
   // For window resizes
   var update_window = function() {
@@ -88,10 +118,12 @@ $(function(){
       if (loaded_sounds == total_sounds) {
           all_loaded = true;
           setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1000));
+          // Starting the second exchange makes music a bad experience
+          // setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 2000));
       }
   }
 
-  // load celesta and clav sounds
+  // Load sounds
   for (var i = 1; i <= 24; i++) {
       if (i > 9) {
           fn = 'c0' + i;
@@ -112,7 +144,6 @@ $(function(){
       }))
   }
 
-  // load swell sounds
   for (var i = 1; i <= 3; i++) {
       swells.push(new Howl({
           src : ['static/public/sounds/swells/swell' + i + '.ogg',
@@ -126,7 +157,7 @@ $(function(){
 
 
 /**
-* Randomly selects a swell audio and plays it
+* Randomly selects a swell sound and plays it
 */
 function playRandomSwell() {
     var index = Math.round(Math.random() * (swells.length - 1));
@@ -137,7 +168,7 @@ function playRandomSwell() {
 /**
 * Plays a sound(celesta and clav) based on passed parameters
 */
-function playSound(size, type, volume) {
+function playSound(size, type) {
     var max_pitch = 100.0;
     var log_used = 1.0715307808111486871978099;
     var pitch = 100 - Math.min(max_pitch, Math.log(size + log_used) / Math.log(log_used));
@@ -162,29 +193,31 @@ function playSound(size, type, volume) {
 }
 
 // Following are the n numbers of event consumers
-// consuming n events per second with a random delay between them
+// consuming n events each per second with a random delay between them
 
 function playFromQueueExchange1(){
   var event = eventQueue.shift();
   if(event != null && event.message != null && svg != null){
-    playSound(event.message.length*1.1, event.type, 1);
+    playSound(event.message.length*1.1, event.type);
     if(!document.hidden)
       drawEvent(event, svg);
   }
-  setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1000) + 600);
+  setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1000) + 500);
+  $('.events-remaining-value').html(eventQueue.length);
 }
 
 function playFromQueueExchange2(){
   var event = eventQueue.shift();
   if(event != null && event.message != null && svg != null){
-    playSound(event.message.length, event.type, 0.7);
+    playSound(event.message.length, event.type);
     if(!document.hidden)
       drawEvent(event, svg);
   }
   setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 1000) + 500);
+  $('.events-remaining-value').html(eventQueue.length);
 }
 
-
+// This method capitalizes the string in place
 String.prototype.capitalize=function(all){
     if(all){
        return this.split(' ').map(e=>e.capitalize()).join(' ');
@@ -215,7 +248,7 @@ function drawEvent(data, svg_area) {
       case "IssuesEvent":
         label_text = data.user.capitalize() + " " +
           data.action + " an issue in " + data.repo_name;
-          edit_color = 'rgb(255,23,68)';
+          edit_color = '#FFFF00';
       break;
       case "IssueCommentEvent":
         label_text = data.user.capitalize() + " commented in " + data.repo_name;
@@ -270,13 +303,13 @@ function drawEvent(data, svg_area) {
     circle_container.on('mouseover', function() {
       circle_container.append('text')
           .text(label_text)
-          .classed('article-label', true)
+          .classed('label', true)
           .attr('text-anchor', 'middle')
           .transition()
           .delay(1000)
           .style('opacity', 0)
-          .duration(2000)
-          .each('end', function() { no_label = true; })
+          .duration(5000)
+          //.each('end', function() { no_label = true; })
           .remove();
     });
 
