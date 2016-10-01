@@ -161,7 +161,7 @@ function stripData(data){
         'user_avatar': data.actor.avatar_url + 'v=3&s=64',
         'repo_id': data.repo.id,
         'repo_name': data.repo.name,
-        'action': data.payload.action,  // opened, reopened, closed, merged
+        'action': data.payload.action,  // opened, reopened, closed
         'message': data.payload.issue.title,
         'created': data.created_at
       });

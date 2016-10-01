@@ -18,12 +18,11 @@ socket.on('github', function (data) {
   });
   // Don't let the eventQueue grow more than 50
   if (eventQueue.length > 50) eventQueue = eventQueue.slice(0, 50);
-  console.log("Current queue size: " + eventQueue.length);
 });
 
 $(function(){
 
-  Howler.volume(volume * .01);
+//  Howler.volume(volume * .01);
 
 });
 
@@ -39,14 +38,14 @@ function isEventInQueue(event){
   return false;
 }
 
-var scale_factor = 7,
+var scale_factor = 9,
     note_overlap = 15,
     note_timeout = 300,
     current_notes = 0,
     max_life = 20000;
 
-var svg_background_color = '#FFFF00',
-    svg_text_color = '#000',
+var svg_background_color = '#673AB7',
+    svg_text_color = '#FFFFFF',
     newuser_box_color = 'rgb(41, 128, 185)',
     push_color = 'rgb(155, 89, 182)',
     issue_color = 'rgb(46, 204, 113)',
@@ -88,10 +87,7 @@ $(function(){
       loaded_sounds += 1;
       if (loaded_sounds == total_sounds) {
           all_loaded = true;
-          console.log('Sound loading complete');
           setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1000));
-          setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 2000));
-          //setTimeout(playFromQueueExchange3, Math.floor(Math.random() * 3000));
       }
   }
 
@@ -166,35 +162,36 @@ function playSound(size, type, volume) {
 }
 
 // Following are the n numbers of event consumers
-// consuming n events per second with a definite delay between them
+// consuming n events per second with a random delay between them
 
 function playFromQueueExchange1(){
   var event = eventQueue.shift();
   if(event != null && event.message != null && svg != null){
     playSound(event.message.length*1.1, event.type, 1);
-    drawEvent(event, svg);
+    if(!document.hidden)
+      drawEvent(event, svg);
   }
-  setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1800) + 600);
+  setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1000) + 600);
 }
 
 function playFromQueueExchange2(){
   var event = eventQueue.shift();
   if(event != null && event.message != null && svg != null){
     playSound(event.message.length, event.type, 0.7);
-    drawEvent(event, svg);
+    if(!document.hidden)
+      drawEvent(event, svg);
   }
   setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 1000) + 500);
 }
 
-function playFromQueueExchange3(){
-  var event = eventQueue.shift();
-  if(event != null && event.message != null && svg != null){
-    playSound(event.message.length, event.type, 1);
-    drawEvent(event, svg);
-  }
-  setTimeout(playFromQueueExchange3, Math.floor(Math.random() * 2000) + 0);
-}
 
+String.prototype.capitalize=function(all){
+    if(all){
+       return this.split(' ').map(e=>e.capitalize()).join(' ');
+    }else{
+         return this.charAt(0).toUpperCase() + this.slice(1);
+    }
+}
 
 
 function drawEvent(data, svg_area) {
@@ -203,9 +200,28 @@ function drawEvent(data, svg_area) {
     if (opacity > 0.5) {
         opacity = 0.5;
     }
-
     var size = data.message.length;
-    var label_text = data.user;
+    var label_text;
+    switch(data.type){
+      case "PushEvent":
+        label_text = data.user.capitalize() + " pushed to " + data.repo_name;
+        edit_color = '#FFFFFF';
+      break;
+      case "PullRequestEvent":
+        label_text = data.user.capitalize() + " " +
+          data.action + " " + " a PR for " + data.repo_name;
+          edit_color = '#18FFFF';
+      break;
+      case "IssuesEvent":
+        label_text = data.user.capitalize() + " " +
+          data.action + " an issue in " + data.repo_name;
+          edit_color = 'rgb(255,23,68)';
+      break;
+      case "IssueCommentEvent":
+        label_text = data.user.capitalize() + " commented in " + data.repo_name;
+        edit_color = '#FFEB3B';
+      break;
+    }
     var csize = size;
     var no_label = false;
     var type = data.type;
@@ -224,8 +240,6 @@ function drawEvent(data, svg_area) {
         .attr('fill', edit_color)
         .style('opacity', starting_opacity)
 
-    console.log(circle_group);
-
     var ring = circle_group.append('circle');
     ring.attr({r: size + 20, stroke: 'none'});
     ring.transition()
@@ -236,13 +250,14 @@ function drawEvent(data, svg_area) {
     ring.remove();
 
     var circle_container = circle_group.append('a');
-    circle_container.attr('xlink:href', 'https://github.com/' + data.user);
+    circle_container.attr('xlink:href', 'https://github.com/' + data.repo_name);
     circle_container.attr('target', '_blank');
     circle_container.attr('fill', svg_text_color);
 
     var circle = circle_container.append('circle');
     circle.classed(type, true);
     circle.attr('r', size)
+      .attr('fill', edit_color)
       .transition()
       .duration(max_life)
       .style('opacity', 0)
@@ -253,20 +268,16 @@ function drawEvent(data, svg_area) {
 
 
     circle_container.on('mouseover', function() {
-        if (no_label) {
-            no_label = false;
-            circle_container.append('text')
-                .text(label_text)
-                .classed('article-label', true)
-                .attr('text-anchor', 'middle')
-                .transition()
-                .delay(1000)
-                .style('opacity', 0)
-                .duration(2000)
-                .each('end', function() { no_label = true; })
-                .remove();
-        }
-
+      circle_container.append('text')
+          .text(label_text)
+          .classed('article-label', true)
+          .attr('text-anchor', 'middle')
+          .transition()
+          .delay(1000)
+          .style('opacity', 0)
+          .duration(2000)
+          .each('end', function() { no_label = true; })
+          .remove();
     });
 
     var text = circle_container.append('text')
