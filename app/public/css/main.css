@@ -54,7 +54,7 @@ header{
   position: relative;;
   width: 100%;
   height: 35px;
-  background: #000;
+  background: #673AB7;
   color: #fff;
   font-family: 'Source Sans Pro', sans-serif;
 	padding: 20px;
@@ -74,4 +74,21 @@ header{
 
 #area{
 	width: 100%;
+	overflow: hidden;
+}
+
+circle {
+    fill-opacity: 0.5;
+}
+
+.article-label {
+    font: 1.0em 'Source Sans Pro', sans-serif;
+    text-shadow:1px 1px 0 rgb(28, 39, 51),
+    -1px -1px 0 rgb(28, 39, 51),
+    1px -1px 0 rgb(28, 39, 51),
+    -1px 1px 0 rgb(28, 39, 51),
+    0px 1px 0 rgb(28, 39, 51),
+    1px 0px 0 rgb(28, 39, 51),
+    0px -1px 0 rgb(28, 39, 51),
+    -1px 0px 0 rgb(28, 39, 51);
 }
