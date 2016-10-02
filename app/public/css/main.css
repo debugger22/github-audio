@@ -102,6 +102,7 @@ header{
 #area{
 	width: 100%;
 	position: relative;
+	height: calc(100vh - 70px);
 }
 
 circle {
