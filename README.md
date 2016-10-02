@@ -9,7 +9,7 @@ Installation on OSX
 
 ```bash
 $ brew install nodejs
-$ brew npm
+$ brew install npm
 $ brew install redis
 ```
 
