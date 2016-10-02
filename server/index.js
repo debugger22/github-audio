@@ -46,13 +46,7 @@ app.get('/', function (req, res) {
   res.sendFile(path.resolve('app/index.html'));
 });
 
-// Set number of connected users to 0
-redis_client.set('connected_users', 0);
-
-
-
-
- var allClients = [];
+var allClients = [];
 
 // When a socket connection is created
 io.on('connection', function (socket) {
