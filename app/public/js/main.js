@@ -6,8 +6,8 @@ var width;
 var height;
 var mute = false;
 
-var scale_factor = 9,
-    note_overlap = 15,
+var scale_factor = 6,
+    note_overlap = 2,
     note_timeout = 300,
     current_notes = 0,
     max_life = 20000;
@@ -253,20 +253,25 @@ function drawEvent(data, svg_area) {
     }
     var size = data.message.length;
     var label_text;
+    var ring_radius = 80;
+    var ring_anim_duration = 3000;
+    svg_text_color = '#FFFFFF';
     switch(data.type){
       case "PushEvent":
         label_text = data.user.capitalize() + " pushed to " + data.repo_name;
-        edit_color = '#FFFFFF';
+        edit_color = '#B2DFDB';
       break;
       case "PullRequestEvent":
         label_text = data.user.capitalize() + " " +
           data.action + " " + " a PR for " + data.repo_name;
-          edit_color = '#18FFFF';
+          edit_color = '#C6FF00';
+          ring_anim_duration = 10000;
+          ring_radius = 600;
       break;
       case "IssuesEvent":
         label_text = data.user.capitalize() + " " +
           data.action + " an issue in " + data.repo_name;
-          edit_color = '#FFFF00';
+          edit_color = '#FFEB3B';
       break;
       case "IssueCommentEvent":
         label_text = data.user.capitalize() + " commented in " + data.repo_name;
@@ -291,14 +296,15 @@ function drawEvent(data, svg_area) {
         .attr('fill', edit_color)
         .style('opacity', starting_opacity)
 
+
     var ring = circle_group.append('circle');
-    ring.attr({r: size + 20, stroke: 'none'});
+    ring.attr({r: size, stroke: 'none'});
     ring.transition()
-         .attr('r', size + 40)
-         .style('opacity', 0)
-         .ease(Math.sqrt)
-         .duration(2500);
-    ring.remove();
+        .attr('r', size + ring_radius)
+        .style('opacity', 0)
+        .ease(Math.sqrt)
+        .duration(ring_anim_duration)
+        .remove();
 
     var circle_container = circle_group.append('a');
     circle_container.attr('xlink:href', 'https://github.com/' + data.repo_name);
@@ -312,9 +318,9 @@ function drawEvent(data, svg_area) {
       .transition()
       .duration(max_life)
       .style('opacity', 0)
-    //circle.each('end', function(){
-    //        circle_group.remove();
-    //})
+      //.each(function(){
+      //      circle_group.remove();
+      //  })
       .remove();
 
 
@@ -323,11 +329,12 @@ function drawEvent(data, svg_area) {
           .text(label_text)
           .classed('label', true)
           .attr('text-anchor', 'middle')
+          .attr('font-size', '0.8em')
           .transition()
           .delay(1000)
           .style('opacity', 0)
-          .duration(5000)
-          //.each('end', function() { no_label = true; })
+          .duration(2000)
+          .each(function() { no_label = true; })
           .remove();
     });
 
@@ -335,10 +342,11 @@ function drawEvent(data, svg_area) {
         .text(label_text)
         .classed('article-label', true)
         .attr('text-anchor', 'middle')
+        .attr('font-size', '0.8em')
         .transition()
-        .delay(1000)
+        .delay(2000)
         .style('opacity', 0)
-        .duration(2000)
-        //.each('end', function() { no_label = true; })
+        .duration(5000)
+        .each(function() { no_label = true; })
         .remove();
 }
