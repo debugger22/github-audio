@@ -157,15 +157,15 @@ footer{
 
 .footer-right-text-block{
     float:right;
-    margin-right:3%;
+    margin-right:2%;
     text-align:right;
     line-height:1.3em;
 }
 
 .social-buttons{
-	position: fixed;
+	position: absolute;
 	bottom:20px;
-	right:20px;
+	right:60px;
 	z-index: 2;
 }
 
