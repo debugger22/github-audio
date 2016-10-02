@@ -231,7 +231,7 @@ function playFromQueueExchange2(){
     if(!document.hidden)
       drawEvent(event, svg);
   }
-  setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 1000) + 500);
+  setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 800) + 500);
   $('.events-remaining-value').html(eventQueue.length);
 }
 
