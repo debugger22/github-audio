@@ -39,8 +39,8 @@ socket.on('github', function (data) {
       eventQueue.push(event);
     }
   });
-  // Don't let the eventQueue grow more than 50
-  if (eventQueue.length > 50) eventQueue = eventQueue.slice(0, 50);
+  // Don't let the eventQueue grow more than 100
+  if (eventQueue.length > 100) eventQueue = eventQueue.slice(0, 100);
 });
 
 socket.on('connect', function(){

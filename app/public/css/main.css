@@ -50,9 +50,11 @@ a{
 }
 
 html,body{
-	background-color: white;
+	background-color: #0288D1;
 	font-family: 'Source Sans Pro', sans-serif;
 	font-size: 16px;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }
 
 header{
@@ -79,7 +81,7 @@ header{
 
 .events-remaining{
 	float:right;
-	margin-right: 3%;
+	margin-right: 5%;
 }
 
 .events-remaining-text, .events-remaining-value{
@@ -87,10 +89,14 @@ header{
 	visibility: visible;
 }
 
-.active-nerds{
-	float:right;
-	line-height: 2em;
-	margin-right: 70px;
+
+#cmdMute{
+    width:28px;
+    height:28px;
+    cursor:pointer;
+    position: absolute;
+    top: 20px;
+    right: 40px;
 }
 
 #area{
@@ -144,9 +150,45 @@ footer{
 	font-size: 0.9em;
 }
 
+.footer-left-text-block{
+    float:left;
+    line-height:1.3em;
+}
+
+.footer-right-text-block{
+    float:right;
+    margin-right:3%;
+    text-align:right;
+    line-height:1.3em;
+}
+
 .social-buttons{
 	position: fixed;
 	bottom:20px;
 	right:20px;
 	z-index: 2;
+}
+
+
+@media only screen and (max-device-width: 480px) {
+
+    .footer-left-text-block{
+        width: 100%;
+        margin: 0 auto;
+        line-height:1.3em;
+    }
+
+    .footer-right-text-block{
+        width: 100%;
+        margin: 0 auto;
+        line-height:1.3em;
+        float: left;
+        text-align: left;
+        margin-top: 20px;
+    }
+
+    .online-users-div{
+        text-align: left;
+    }
+
 }
