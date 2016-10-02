@@ -81,7 +81,7 @@ function fetchDataFromGithub(){
         if(socket != null && socket.connected == true){
             redis_client.get('connected_users', function(err, count) {
                 if(!err && count != null){
-                    socket.json.emit('github', {data: stripedData, connected_users: count});
+                    socket.volatile.json.emit('github', {data: stripedData, connected_users: count});
                 }else{
                   logger.error(err.message);
                 }
