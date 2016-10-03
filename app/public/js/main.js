@@ -318,9 +318,6 @@ function drawEvent(data, svg_area) {
       .transition()
       .duration(max_life)
       .style('opacity', 0)
-      //.each(function(){
-      //      circle_group.remove();
-      //  })
       .remove();
 
 
@@ -349,4 +346,10 @@ function drawEvent(data, svg_area) {
         .duration(5000)
         .each(function() { no_label = true; })
         .remove();
+
+  // Remove HTML of decayed events
+  // Keep it less than 50
+  if($('#area svg g').length > 50){
+    $('#area svg g:lt(10)').remove();
+  }
 }
