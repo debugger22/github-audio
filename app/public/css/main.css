@@ -53,7 +53,6 @@ html,body{
 	background-color: #0288D1;
 	font-family: 'Source Sans Pro', sans-serif;
 	font-size: 16px;
-    overflow-y: scroll;
     overflow-x: hidden;
 }
 
