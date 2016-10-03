@@ -110,6 +110,14 @@ circle {
 
 .label {
     font: 1.0em 'Source Sans Pro', sans-serif;
+    text-shadow:1px 1px 0 rgb(28, 39, 51),
+    -1px -1px 0 rgb(28, 39, 51),
+    1px -1px 0 rgb(28, 39, 51),
+    -1px 1px 0 rgb(28, 39, 51),
+    0px 1px 0 rgb(28, 39, 51),
+    1px 0px 0 rgb(28, 39, 51),
+    0px -1px 0 rgb(28, 39, 51),
+    -1px 0px 0 rgb(28, 39, 51);
 }
 
 .online-users-div{
