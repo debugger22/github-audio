@@ -254,11 +254,15 @@ function playFromQueueExchange2(){
 
 // This method capitalizes the string in place
 String.prototype.capitalize=function(all){
+  try{
     if(all){
        return this.split(' ').map(e=>e.capitalize()).join(' ');
     }else{
          return this.charAt(0).toUpperCase() + this.slice(1);
     }
+  }catch(err){
+    return all;
+  }
 }
 
 

@@ -217,10 +217,15 @@ footer{
 
 @media only screen and (max-device-width: 480px) {
 
+    #config-area{
+        padding: 0px;
+        min-height: 600px;
+    }
+
     .site-description{
         font-size: 1em;
         line-height: 1.6em;
-        width: 90%;
+        width: 50%;
         margin: 0 auto;
     }
 
