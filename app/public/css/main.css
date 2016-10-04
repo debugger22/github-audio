@@ -1,4 +1,4 @@
-@import 'https://fonts.googleapis.com/css?family=Source+Sans+Pro';
+@import 'https://fonts.googleapis.com/css?family=Source+Sans+Pro:400|Josefin+Sans';
 
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -52,6 +52,7 @@ a{
 html,body{
 	background-color: #0288D1;
 	font-family: 'Source Sans Pro', sans-serif;
+    font-weight: 400;
 	font-size: 16px;
     overflow-x: hidden;
 }
@@ -154,6 +155,35 @@ circle {
 	color: #E0E0E0;
 }
 
+#config-area{
+    width: 100%;
+    background: #FFFFFF;
+    min-height: 300px;
+    padding: 40px;
+    color: #555555;
+    font-family: 'Josefin Sans', sans-serif;
+    font-weight: 300;
+}
+
+#consumption-rate-div{
+    width: 50%;
+    margin: 0 auto;
+    margin-bottom: 0px;
+    visibility: hidden;
+}
+
+#eventConsumptionSlider{
+    margin-top: 20px;
+    width: 300px;
+}
+
+.site-description{
+    font-size: 1em;
+    line-height: 1.6em;
+    width: 50%;
+    margin: 0 auto;
+}
+
 footer{
 	width: 100%;
 	height: 200px;
@@ -186,6 +216,13 @@ footer{
 
 
 @media only screen and (max-device-width: 480px) {
+
+    .site-description{
+        font-size: 1em;
+        line-height: 1.6em;
+        width: 90%;
+        margin: 0 auto;
+    }
 
     .footer-left-text-block{
         width: 100%;
