@@ -28,9 +28,11 @@
     <title>GitHub Audio</title>
     <link rel="mask-icon" href="/static/public/images/electric-guitar.svg" color="orange">
     <link rel="shortcut icon" type="image/png" href="/static/public/images/favicon.png"/>
-    <link rel="stylesheet" href="/static/public/css/main.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/odometer/0.4.7/themes/odometer-theme-default.css" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.min.css" />
+    <link rel="stylesheet" href="/static/public/css/main.css"/>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/howler/2.0.0/howler.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
     <script src="//cdn.jsdelivr.net/odometer/0.4.7/odometer.min.js"></script>
@@ -47,6 +49,7 @@
       js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.7&appId=718063574909410";
       fjs.parentNode.insertBefore(js, fjs);
     }(document, 'script', 'facebook-jssdk'));</script>
+
     <header>
       <h1 class="header-text">
         GitHub Audio&nbsp;
@@ -55,14 +58,17 @@
       <div class="events-remaining">
         <span class="events-remaining-value odometer"></span>&nbsp;
         <span class="events-remaining-text">events remaining in queue</span>&nbsp;
+        <div id="volumeSlider"></div>
+        <!-- <img id="cmdMute" src="/static/public/images/speaker.svg" alt="mute/unmute"/> -->
       </div>
-      <img id="cmdMute" src="/static/public/images/speaker.svg" alt="mute/unmute"/>
     </header>
+
     <div id="area">
       <div class="online-users-div">
-        <h2 class="online-users-text"><span class="possibly-text">possibly</span>&nbsp;<span class="odometer online-users-count"></span> people listening</h2>
+        <h2 class="online-users-text"><span class="odometer online-users-count"></span> people listening</h2>
       </div>
     </div>
+
     <footer>
       <div class="footer-left-text-block">
         this project is open source, you can view it on <a href="https://github.com/debugger22/github-audio" target="_blank">GitHub</a><br/>
