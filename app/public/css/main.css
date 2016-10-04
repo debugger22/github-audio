@@ -83,7 +83,6 @@ header{
 	float:right;
 	margin-right: 5%;
     margin-top: 30px;
-    visibility: hidden;
 }
 
 .events-remaining-text, .events-remaining-value{
