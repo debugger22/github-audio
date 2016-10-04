@@ -33,7 +33,7 @@
     <link rel="stylesheet" href="/static/public/css/main.css"/>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
-    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/howler/2.0.0/howler.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.8/socket.io.min.js"></script>
     <script src="//cdn.jsdelivr.net/odometer/0.4.7/odometer.min.js"></script>
@@ -67,6 +67,20 @@
     <div id="area">
       <div class="online-users-div">
         <h2 class="online-users-text"><span class="odometer online-users-count"></span> people listening</h2>
+      </div>
+    </div>
+    <div id="config-area">
+      <div id="consumption-rate-div">
+        Set events consumption rate <div id="eventConsumptionSlider"></div>
+      </div>
+      <div class="site-description">
+        <h4>About</h4>
+        <br/>
+        <p>This website tracks events happening across GitHub and converts them to music notes based on certain parameters.</p><br/>
+        <p>
+          There are three types of sounds(bell, string pluck and string swell) based on four types of events(PushEvent, PullRequestEvent, IssuesEvent and IssueCommentEvent).
+          Bells represent PushEvents, string plucks represent IssuesEvents and IssueCommentEvents whereas string swells represent PullRequestEvents.
+        </p>
       </div>
     </div>
 

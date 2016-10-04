@@ -109,6 +109,11 @@ $(function(){
     }
   });
 
+  $('#eventConsumptionSlider').slider({
+    'min': 1,
+    'max': 100
+  });
+
 
   // Main drawing area
   svg = d3.select("#area").append("svg");
