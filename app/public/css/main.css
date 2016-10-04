@@ -81,6 +81,7 @@ header{
 .events-remaining{
 	float:right;
 	margin-right: 5%;
+    margin-top: 30px;
 }
 
 .events-remaining-text, .events-remaining-value{
@@ -97,6 +98,22 @@ header{
     top: 20px;
     right: 40px;
 }
+
+#volumeSlider{
+    cursor:pointer;
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    width: 100px;
+    opacity: 0.3;
+    border-radius: 5px;
+}
+
+#volumeSlider:hover{
+    cursor:pointer;
+    opacity: 0.9;
+}
+
 
 #area{
 	width: 100%;
@@ -122,21 +139,19 @@ circle {
 
 .online-users-div{
 	text-align: center;
-	position: fixed;
-	bottom: 20px;
+	position: absolute;
+	bottom: 60px;
 	width: 100%;
 	margin: 0 auto;
+    font-size: 0.9em;
 	z-index: 1;
+    opacity: 0.5;
 }
 
 .online-users-text{
 	font-family: 'Source Sans Pro', sans-serif;
 	font-size: 1em;
 	color: #E0E0E0;
-}
-
-.possibly-text{
-	visibility: false;
 }
 
 footer{
@@ -180,7 +195,7 @@ footer{
 
     .footer-right-text-block{
         width: 100%;
-        margin: 0 auto;
+        margin-left: 0 auto;
         line-height:1.3em;
         float: left;
         text-align: left;
@@ -188,6 +203,7 @@ footer{
     }
 
     .online-users-div{
+        margin-left: 20px;
         text-align: left;
     }
 

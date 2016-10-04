@@ -5,6 +5,7 @@ var drawingArea;
 var width;
 var height;
 var mute = false;
+var volume = 0.6;
 
 var scale_factor = 6,
     note_overlap = 2,
@@ -50,7 +51,6 @@ socket.on('connect', function(){
       $('.offline-text').css('visibility', 'hidden');
       $('.events-remaining-text').css('visibility', 'hidden');
       $('.events-remaining-value').css('visibility', 'hidden');
-      $('.possibly-text').css('visibility', 'hidden');
     }
 });
 
@@ -61,7 +61,6 @@ socket.on('disconnect', function(){
       $('.offline-text').css('visibility', 'visible');
       $('.events-remaining-text').css('visibility', 'visible');
       $('.events-remaining-value').css('visibility', 'visible');
-      $('.possibly-text').css('visibility', 'visible');
 
     }
 });
@@ -73,7 +72,6 @@ socket.on('error', function(){
       $('.offline-text').css('visibility', 'visible');
       $('.events-remaining-text').css('visibility', 'visible');
       $('.events-remaining-value').css('visibility', 'visible');
-      $('.possibly-text').css('visibility', 'visible');
     }
 });
 
@@ -97,6 +95,20 @@ $(function(){
   $('svg').css('background-color', svg_background_color_online);
   $('header').css('background-color', svg_background_color_online);
   $('svg text').css('color', svg_text_color);
+  $('#volumeSlider').slider({
+    'max': 100,
+    'min': 0,
+    'value': volume*100,
+    'slide' : function(event, ui){
+      volume = ui.value/100.0;
+      Howler.volume(volume);
+    },
+    'change' : function(event, ui){
+      volume = ui.value/100.0;
+      Howler.volume(volume);
+    }
+  });
+
 
   // Main drawing area
   svg = d3.select("#area").append("svg");
@@ -167,7 +179,7 @@ $(function(){
       $('#cmdMute').attr('src', '/static/public/images/speaker-muted.svg');
     }
   });
-  Howler.volume(0.6);
+  Howler.volume(volume);
 
 });
 
