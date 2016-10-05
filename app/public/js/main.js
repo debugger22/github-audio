@@ -361,3 +361,14 @@ function drawEvent(data, svg_area) {
     $('#area svg g:lt(10)').remove();
   }
 }
+
+
+// Some hack to start Howler.js it on iPhone
+var unlockIOSAudioPlayback = function () {
+    var context = Howler.ctx;
+    var oscillator = context.createOscillator();
+    oscillator.frequency.value = 200;
+    oscillator.connect(context.destination);
+    oscillator.start(0);
+    oscillator.stop(0);
+};
