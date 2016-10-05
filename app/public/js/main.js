@@ -93,6 +93,10 @@ function isEventInQueue(event){
  * To extend this function, simply add return true for events that should be filtered.
  */
 function shouldEventBeIgnored(event){
+  // This adds an easter egg to only play closed PRs
+  if (!!ULTIMATE_DREAM_KILLER)
+    return (event.type !== "PullRequestEvent" || event.action !== "closed");
+
   return false;
 }
   
