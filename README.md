@@ -7,7 +7,7 @@ _Imitation is the sincerest form of flattery._ - __Oscar Wilde__
 
 But seriously, [listen-to-wikipedia](https://github.com/hatnote/listen-to-wikipedia) by [@slaporte](https://github.com/slaporte) and [@mahmoud](https://github.com/mahmoud) is the hotness.
 
-<sub><sup><sub><sup>Use [`ULIMATE_DREAM_KILLER`](https://github.com/debugger22/github-audio/commit/ed47067f5e56ab70d65fa31f72bf2dbc513f8f56) to filter all events except closed PRs.
+<sub><sup><sub><sup>Use [`ULTIMATE_DREAM_KILLER`](https://github.com/debugger22/github-audio/commit/ed47067f5e56ab70d65fa31f72bf2dbc513f8f56) to filter all events except closed PRs.
 
 
 Media
