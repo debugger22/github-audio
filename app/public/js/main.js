@@ -5,6 +5,7 @@ var drawingArea;
 var width;
 var height;
 var volume = 0.6;
+var ULTIMATE_DREAM_KILLER = false;
 
 var scale_factor = 6,
     note_overlap = 2,
@@ -98,7 +99,7 @@ function shouldEventBeIgnored(event){
 
   return false;
 }
-  
+
 
 $(function(){
   element = document.documentElement;
