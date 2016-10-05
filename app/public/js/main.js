@@ -36,7 +36,7 @@ var socket = io(document.location.hostname);
 socket.on('github', function (data) {
   $('.online-users-count').html(data.connected_users);
   data.data.forEach(function(event){
-    if(!isEventInQueue(event) || shouldEventBeIgnored(event)){
+    if(!isEventInQueue(event)){
       eventQueue.push(event);
     }
   });
@@ -233,7 +233,7 @@ function playSound(size, type) {
 
 function playFromQueueExchange1(){
   var event = eventQueue.shift();
-  if(event != null && event.message != null && svg != null){
+  if(event != null && event.message != null && !shouldEventBeIgnored(event) && svg != null){
     playSound(event.message.length*1.1, event.type);
     if(!document.hidden)
       drawEvent(event, svg);
@@ -244,7 +244,7 @@ function playFromQueueExchange1(){
 
 function playFromQueueExchange2(){
   var event = eventQueue.shift();
-  if(event != null && event.message != null && svg != null){
+  if(event != null && event.message != null && !shouldEventBeIgnored(event) && svg != null){
     playSound(event.message.length, event.type);
     if(!document.hidden)
       drawEvent(event, svg);
