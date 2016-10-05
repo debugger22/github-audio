@@ -36,7 +36,7 @@ var socket = io(document.location.hostname);
 socket.on('github', function (data) {
   $('.online-users-count').html(data.connected_users);
   data.data.forEach(function(event){
-    if(!isEventInQueue(event)){
+    if(!isEventInQueue(event) || shouldEventBeIgnored(event)){
       eventQueue.push(event);
     }
   });
@@ -86,6 +86,16 @@ function isEventInQueue(event){
   }
   return false;
 }
+
+/**
+ * This function adds a filter for events that we don't want to hear.
+ *
+ * To extend this function, simply add return true for events that should be filtered.
+ */
+function shouldEventBeIgnored(event){
+  return false;
+}
+  
 
 $(function(){
   element = document.documentElement;
