@@ -4,7 +4,6 @@ var element;
 var drawingArea;
 var width;
 var height;
-var mute = false;
 var volume = 0.6;
 
 var scale_factor = 6,
@@ -220,8 +219,7 @@ function playSound(size, type) {
 function playFromQueueExchange1(){
   var event = eventQueue.shift();
   if(event != null && event.message != null && svg != null){
-    if(!mute)
-      playSound(event.message.length*1.1, event.type);
+    playSound(event.message.length*1.1, event.type);
     if(!document.hidden)
       drawEvent(event, svg);
   }
@@ -232,8 +230,7 @@ function playFromQueueExchange1(){
 function playFromQueueExchange2(){
   var event = eventQueue.shift();
   if(event != null && event.message != null && svg != null){
-    if(!mute)
-      playSound(event.message.length, event.type);
+    playSound(event.message.length, event.type);
     if(!document.hidden)
       drawEvent(event, svg);
   }
