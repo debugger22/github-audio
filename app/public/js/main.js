@@ -173,17 +173,6 @@ $(function(){
       }));
   }
 
-  $('#cmdMute').click(function(){
-    if(mute == true){
-      mute = false;
-      Howler.mute(mute);
-      $('#cmdMute').attr('src', '/static/public/images/speaker.svg');
-    }else{
-      mute = true;
-      Howler.mute(mute);
-      $('#cmdMute').attr('src', '/static/public/images/speaker-muted.svg');
-    }
-  });
   Howler.volume(volume);
 
 });

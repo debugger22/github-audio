@@ -90,16 +90,6 @@ header{
 	visibility: hidden;
 }
 
-
-#cmdMute{
-    width:28px;
-    height:28px;
-    cursor:pointer;
-    position: absolute;
-    top: 20px;
-    right: 40px;
-}
-
 #volumeSlider{
     cursor:pointer;
     position: absolute;
@@ -114,7 +104,6 @@ header{
     cursor:pointer;
     opacity: 0.9;
 }
-
 
 #area{
 	width: 100%;
