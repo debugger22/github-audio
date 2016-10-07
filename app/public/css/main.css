@@ -155,16 +155,21 @@ circle {
     font-weight: 300;
 }
 
-#consumption-rate-div{
+#org-repo-filter-div{
     width: 50%;
     margin: 0 auto;
     margin-bottom: 0px;
-    visibility: hidden;
 }
 
-#eventConsumptionSlider{
-    margin-top: 20px;
-    width: 300px;
+#org-repo-filter-name{
+    width: 20%;
+    color: gray;
+    padding: 5px;
+    padding-left: 10px;
+    border: none;
+    background: #F1F1F1;
+    font-family: 'Josefin Sans', sans-serif;
+    font-size: 1em;
 }
 
 .site-description{
@@ -172,6 +177,7 @@ circle {
     line-height: 1.6em;
     width: 50%;
     margin: 0 auto;
+    margin-top: 50px;
 }
 
 footer{
