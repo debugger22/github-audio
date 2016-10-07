@@ -121,7 +121,6 @@ function stripData(data){
         pushEventCounter++;
       }
     }else if(data.type == 'IssueCommentEvent'){
-      if(IssueCommentEventCounter > 5) return;
       stripedData.push({
         'id': data.id,
         'type': data.type,
@@ -133,7 +132,6 @@ function stripData(data){
         'message': data.body,
         'created': data.created_at
       });
-      IssueCommentEventCounter++;
     }else if(data.type == 'PullRequestEvent'){
       stripedData.push({
         'id': data.id,
@@ -147,7 +145,6 @@ function stripData(data){
         'created': data.created_at
       });
     }else if(data.type == 'IssuesEvent'){
-      if(IssuesEventCounter > 3) return;
       stripedData.push({
         'id': data.id,
         'type': data.type,
@@ -159,7 +156,6 @@ function stripData(data){
         'message': data.payload.issue.title,
         'created': data.created_at
       });
-      IssuesEventCounter++;
     }
   });
   return stripedData;
