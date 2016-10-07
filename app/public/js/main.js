@@ -5,7 +5,7 @@ var drawingArea;
 var width;
 var height;
 var volume = 0.6;
-var ULTIMATE_DREAM_KILLER = false;
+var ULTIMATE_DREAM_KILLER = false;  // https://github.com/debugger22/github-audio/pull/19
 
 var scale_factor = 6,
     note_overlap = 2,
