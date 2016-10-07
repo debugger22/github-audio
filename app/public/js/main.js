@@ -23,7 +23,6 @@ var svg_background_color_online = '#0288D1',
     comment_color = 'rgb(46, 204, 113)'
     edit_color = '#fff',
     total_sounds = 51,
-    total_edits = 0;
 
     var celesta = [],
         clav = [],
@@ -32,7 +31,7 @@ var svg_background_color_online = '#0288D1',
 
 
 
-var socket = io(document.location.hostname);
+var socket = io(document.location.hostname + ":8000");
 socket.on('github', function (data) {
   $('.online-users-count').html(data.connected_users);
   data.data.forEach(function(event){
