@@ -6,7 +6,7 @@ var width;
 var height;
 var volume = 0.6;
 var ULTIMATE_DREAM_KILLER = false;  // https://github.com/debugger22/github-audio/pull/19
-var orgRepoFilterNames;
+var orgRepoFilterNames = [];
 
 var scale_factor = 6,
     note_overlap = 2,
@@ -38,7 +38,7 @@ socket.on('github', function (data) {
   data.data.forEach(function(event){
     if(!isEventInQueue(event)){
       // Filter out events only specified by the user
-      if(orgRepoFilterNames != null && orgRepoFilterNames != []){
+      if(orgRepoFilterNames != []){
         // Don't consider pushes to github.io repos when org filter is on
         if(new RegExp(orgRepoFilterNames.join("|")).test(event.repo_name)
            && event.repo_name.indexOf('github.io') == -1){
@@ -246,8 +246,8 @@ function playFromQueueExchange1(){
   var event = eventQueue.shift();
   if(event != null && event.message != null && !shouldEventBeIgnored(event) && svg != null){
     playSound(event.message.length*1.1, event.type);
-    // if(!document.hidden)
-    drawEvent(event, svg);
+    if(!document.hidden !! orgRepoFilterNames != [])
+      drawEvent(event, svg);
   }
   setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1000) + 500);
   $('.events-remaining-value').html(eventQueue.length);
@@ -257,8 +257,8 @@ function playFromQueueExchange2(){
   var event = eventQueue.shift();
   if(event != null && event.message != null && !shouldEventBeIgnored(event) && svg != null){
     playSound(event.message.length, event.type);
-    // if(!document.hidden)
-    drawEvent(event, svg);
+    if(!document.hidden !! orgRepoFilterNames != [])
+      drawEvent(event, svg);
   }
   setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 800) + 500);
   $('.events-remaining-value').html(eventQueue.length);
