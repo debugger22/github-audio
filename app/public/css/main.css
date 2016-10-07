@@ -55,17 +55,18 @@ html,body{
     font-weight: 400;
 	font-size: 16px;
     overflow-x: hidden;
+    visibility: hidden;
 }
 
 header{
-  position: relative;;
-  width: 100%;
-  height: 35px;
-  color: #fff;
-  font-family: 'Source Sans Pro', sans-serif;
-	padding-left: 20px;
-	padding-top: 20px;
-	padding-bottom: 20px;
+    position: relative;;
+    width: 100%;
+    height: 35px;
+    color: #fff;
+    font-family: 'Source Sans Pro', sans-serif;
+    padding-left: 20px;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .header-text{

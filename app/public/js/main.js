@@ -189,6 +189,9 @@ $(function(){
 
   Howler.volume(volume);
 
+  // Make header and footer visible
+  $('body').css('visibility', 'visible');
+
 });
 
 
