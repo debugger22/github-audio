@@ -20,6 +20,8 @@ const logger = require('./logger');
 const argv = require('minimist')(process.argv.slice(2));
 const isDev = process.env.NODE_ENV !== 'production';
 
+var githubEventsUrl = process.env.GITHUB_EVENTS_URL || 'https://api.github.com/events';
+
 // Get the intended port number, use port 8000 if not provided
 const port = argv.port || process.env.PORT || 8000;
 server.listen(port, (err) => {
@@ -67,7 +69,7 @@ io.on('connection', function (socket) {
 // Function to get events from GitHub API
 function fetchDataFromGithub(){
   var options = {
-    url: 'https://api.github.com/events',
+    url: githubEventsUrl,
     headers: {
       'User-Agent': 'Mozilla/5.0 (Linux; Android 5.1.1; Nexus 5 Build/LMY48B; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/43.0.2357.65 Mobile Safari/537.36',
       'Authorization': 'token ' + process.env.GITHUB_OAUTH_KEY
