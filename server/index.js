@@ -133,6 +133,7 @@ function stripData(data){
         'created': data.created_at
       });
     }else if(data.type == 'PullRequestEvent'){
+      if (data.payload.pull_request.merged) data.payload.action = 'merged';
       stripedData.push({
         'id': data.id,
         'type': data.type,
