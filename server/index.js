@@ -92,7 +92,7 @@ function fetchDataFromGithub(){
       });
 
     }else{
-      logger.error("GitHub status code: " + response.statusCode);
+      logger.error("GitHub status code: " + (response && response.statusCode ? response.statusCode : 'unknown'));
     }
   })
   setTimeout(fetchDataFromGithub, 2000);
