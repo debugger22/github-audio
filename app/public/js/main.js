@@ -137,7 +137,6 @@ $(function(){
   svg = d3.select("#area").append("svg");
   svg.attr({width: width, height: height});
   svg.style('background-color', svg_background_color_online);
-
   // For window resizes
   var update_window = function() {
       width = window.innerWidth || element.clientWidth || drawingArea.clientWidth;
@@ -317,6 +316,7 @@ function drawEvent(data, svg_area) {
     var circle_id = 'd' + ((Math.random() * 100000) | 0);
     var abs_size = Math.abs(size);
     size = Math.max(Math.sqrt(abs_size) * scale_factor, 3);
+    var gravatarSize = size * 1.5;
 
     Math.seedrandom(data.message)
     var x = Math.random() * (width - size) + size;
@@ -350,6 +350,32 @@ function drawEvent(data, svg_area) {
       .transition()
       .duration(max_life)
       .style('opacity', 0)
+      .remove();
+
+      var clipPathId = "clipId_" + (Math.random() * 321312312).toString();
+      circle_container.append('clipPath')
+        .attr('id', clipPathId)
+        .append('circle')
+          .attr('cx', 0)
+          .attr('cy', 0)
+          .attr('width', gravatarSize)
+          .attr('height', gravatarSize)
+          .attr('r', gravatarSize / 2)
+          .transition()
+          .duration(3000)
+          .remove();
+
+    circle_container.append('svg:image')
+      .attr('xlink:href', data.user_avatar)
+      .attr('x', (gravatarSize / 2) * -1)
+      .attr('y', (gravatarSize / 2) * -1)
+      .attr('width', gravatarSize)
+      .attr('height', gravatarSize)
+      .attr('clip-path', 'url(#' + clipPathId + ')')
+      .transition()
+      .delay(2000)
+      .style('opacity', 0)
+      .duration(1000)
       .remove();
 
 
