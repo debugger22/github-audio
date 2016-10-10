@@ -32,8 +32,7 @@ var svg_background_color_online = '#0288D1',
 
 
 
-var socketHost = document.location.hostname + ":" + document.location.port;
-var socket = io(socketHost);
+var socket = io(document.location.host);
 socket.on('github', function (data) {
   $('.online-users-count').html(data.connected_users);
   data.data.forEach(function(event){
