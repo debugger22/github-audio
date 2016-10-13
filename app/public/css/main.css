@@ -215,6 +215,7 @@ footer{
 
     #config-area{
         padding: 0px;
+        padding-top: 50px;
         min-height: 600px;
     }
 
