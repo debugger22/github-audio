@@ -10,14 +10,20 @@ But seriously, [listen-to-wikipedia](https://github.com/hatnote/listen-to-wikipe
 <sub><sup><sub><sup>Use [`ULTIMATE_DREAM_KILLER`](https://github.com/debugger22/github-audio/commit/ed47067f5e56ab70d65fa31f72bf2dbc513f8f56) to filter all events except closed PRs.
 
 
-Media
+Media Attention
 -----
-
 * [The Next Web](http://thenextweb.com/apps/2016/10/03/this-site-tracks-events-across-github-to-generate-calming-work-music/)
 * [Product Hunt](https://www.producthunt.com/tech/github-audio)
 
 
-Installation on OSX
+# Installing dependencies
+
+This application requires:
+* node
+* npm
+* redix
+
+Dependency Installation on OSX
 -------------------
 
 ```bash
@@ -26,7 +32,7 @@ $ brew install npm
 $ brew install redis
 ```
 
-Installation on Linux
+Dependency Installation on Linux
 ---------------------
 
 ```bash
@@ -36,6 +42,7 @@ $ sudo apt-get install npm
 $ sudo apt-get install redis-server
 ```
 
+# Running the Application
 Install node packages
 ---------------------
 
@@ -54,11 +61,17 @@ $ export GITHUB_OAUTH_KEY=<your_github_oauth_key>
 
 Note: Without the GitHub oauth key the number of requests is throttled at 60 per hour. It can be increased to 5000 per hour by using an oauth key.
 
-Run server
+Run Redis and Server
 ----------
 
+```bash
+$ redis-server
+```
+
+In a separate window:
 ```bash
 $ node server
 ```
 
 Note: For production run `export NODE_ENV="production"` before starting the server.
+
