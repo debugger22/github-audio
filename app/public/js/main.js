@@ -338,7 +338,7 @@ function drawEvent(data, svg_area) {
         .remove();
 
     var circle_container = circle_group.append('a');
-    circle_container.attr('xlink:href', 'https://github.com/' + data.repo_name);
+    circle_container.attr('xlink:href', data.url);
     circle_container.attr('target', '_blank');
     circle_container.attr('fill', svg_text_color);
 

@@ -116,7 +116,8 @@ function stripData(data){
           'repo_name': data.repo.name,
           'payload_size': data.payload.size,
           'message': data.payload.commits[0].message,
-          'created': data.created_at
+          'created': data.created_at,
+          'url': data.repo.url
         });
         pushEventCounter++;
       }
@@ -130,9 +131,11 @@ function stripData(data){
         'repo_name': data.repo.name,
         'payload_size': 0,
         'message': data.body,
-        'created': data.created_at
+        'created': data.created_at,
+        'url': data.payload.comment.html_url
       });
     }else if(data.type == 'PullRequestEvent'){
+      if (data.payload.pull_request.merged) data.payload.action = 'merged';
       stripedData.push({
         'id': data.id,
         'type': data.type,
@@ -142,7 +145,8 @@ function stripData(data){
         'repo_name': data.repo.name,
         'action': data.payload.action,  // opened, reopened, closed, merged
         'message': data.payload.pull_request.title,
-        'created': data.created_at
+        'created': data.created_at,
+        'url': data.payload.pull_request.html_url
       });
     }else if(data.type == 'IssuesEvent'){
       stripedData.push({
@@ -154,7 +158,8 @@ function stripData(data){
         'repo_name': data.repo.name,
         'action': data.payload.action,  // opened, reopened, closed
         'message': data.payload.issue.title,
-        'created': data.created_at
+        'created': data.created_at,
+        'url': data.payload.issue.html_url
       });
     }
   });
