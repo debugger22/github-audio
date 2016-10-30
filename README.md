@@ -21,7 +21,7 @@ Media Attention
 This application requires:
 * node
 * npm
-* redix
+* redis
 
 Dependency Installation on OSX
 -------------------
