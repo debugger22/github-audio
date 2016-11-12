@@ -136,7 +136,7 @@ $(function(){
       width = window.innerWidth || element.clientWidth || drawingArea.clientWidth;
       height = (window.innerHeight  - $('header').height())|| (element.clientHeight - $('header').height()) || (drawingArea.clientHeight - $('header').height());
       svg.attr("width", width).attr("height", height);
-  }
+  };
   window.onresize = update_window;
   update_window();
 
@@ -148,7 +148,7 @@ $(function(){
           // Starting the second exchange makes music a bad experience
           // setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 2000));
       }
-  }
+  };
 
   // Load sounds
   for (var i = 1; i <= 24; i++) {
@@ -163,14 +163,14 @@ $(function(){
           volume : 0.7,
           onload : sound_load(),
           buffer: true,
-      }))
+      }));
       clav.push(new Howl({
           src : ['https://d1fz9d31zqor6x.cloudfront.net/sounds/clav/' + fn + '.ogg',
                   'https://d1fz9d31zqor6x.cloudfront.net/sounds/clav/' + fn + '.mp3'],
           volume : 0.4,
           onload : sound_load(),
           buffer: true,
-      }))
+      }));
   }
 
   for (var i = 1; i <= 3; i++) {
@@ -266,7 +266,7 @@ String.prototype.capitalize=function(all){
     }else{
          return this.charAt(0).toUpperCase() + this.slice(1);
     }
-}
+};
 
 
 function drawEvent(data, svg_area) {
@@ -307,7 +307,7 @@ function drawEvent(data, svg_area) {
     var abs_size = Math.abs(size);
     size = Math.max(Math.sqrt(abs_size) * scale_factor, 3);
 
-    Math.seedrandom(data.message)
+    Math.seedrandom(data.message);
     var x = Math.random() * (width - size) + size;
     var y = Math.random() * (height - size) + size;
 
@@ -315,7 +315,7 @@ function drawEvent(data, svg_area) {
     var circle_group = svg_area.append('g')
         .attr('transform', 'translate(' + x + ', ' + y + ')')
         .attr('fill', edit_color)
-        .style('opacity', starting_opacity)
+        .style('opacity', starting_opacity);
 
 
     var ring = circle_group.append('circle');

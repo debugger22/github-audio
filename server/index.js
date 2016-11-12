@@ -61,7 +61,7 @@ io.on('connection', function (socket) {
   socket.on('error', function(){
     logger.error('Got errored!');
     redis_client.decr('connected_users');
-  })
+  });
 });
 
 // Function to get events from GitHub API
@@ -92,7 +92,7 @@ function fetchDataFromGithub(){
     }else{
       logger.error("GitHub status code: " + response.statusCode);
     }
-  })
+  });
   setTimeout(fetchDataFromGithub, 2000);
 }
 setTimeout(fetchDataFromGithub, 2000);
