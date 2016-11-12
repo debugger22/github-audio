@@ -101,8 +101,6 @@ setTimeout(fetchDataFromGithub, 2000);
 function stripData(data){
   var stripedData = [];
   var pushEventCounter = 0;
-  var IssueCommentEventCounter = 0;
-  var IssuesEventCounter = 0;
   data.forEach(function(data){
     if(data.type == 'PushEvent'){
       if(pushEventCounter > 3) return;

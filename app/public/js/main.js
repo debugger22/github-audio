@@ -17,18 +17,12 @@ var scale_factor = 6,
 var svg_background_color_online = '#0288D1',
     svg_background_color_offline = '#E91E63',
     svg_text_color = '#FFFFFF',
-    newuser_box_color = 'rgb(41, 128, 185)',
-    push_color = 'rgb(155, 89, 182)',
-    issue_color = 'rgb(46, 204, 113)',
-    pull_request_color = 'rgb(46, 204, 113)',
-    comment_color = 'rgb(46, 204, 113)',
     edit_color = '#fff',
     total_sounds = 51;
 
     var celesta = [],
         clav = [],
-        swells = [],
-        all_loaded = false;
+        swells = [];
 
 
 
@@ -147,10 +141,9 @@ $(function(){
   update_window();
 
   var loaded_sounds = 0;
-  var sound_load = function(r) {
+  var sound_load = function() {
       loaded_sounds += 1;
       if (loaded_sounds == total_sounds) {
-          all_loaded = true;
           setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1000));
           // Starting the second exchange makes music a bad experience
           // setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 2000));
@@ -309,11 +302,8 @@ function drawEvent(data, svg_area) {
         edit_color = '#FF5722';
       break;
     }
-    var csize = size;
-    var no_label = false;
     var type = data.type;
 
-    var circle_id = 'd' + ((Math.random() * 100000) | 0);
     var abs_size = Math.abs(size);
     size = Math.max(Math.sqrt(abs_size) * scale_factor, 3);
 
@@ -362,11 +352,10 @@ function drawEvent(data, svg_area) {
           .delay(1000)
           .style('opacity', 0)
           .duration(2000)
-          .each(function() { no_label = true; })
           .remove();
     });
 
-    var text = circle_container.append('text')
+    circle_container.append('text')
         .text(label_text)
         .classed('article-label', true)
         .attr('text-anchor', 'middle')
@@ -375,7 +364,6 @@ function drawEvent(data, svg_area) {
         .delay(2000)
         .style('opacity', 0)
         .duration(5000)
-        .each(function() { no_label = true; })
         .remove();
 
   // Remove HTML of decayed events
