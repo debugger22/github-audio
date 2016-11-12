@@ -27,18 +27,18 @@ var svg_background_color_online = '#0288D1',
 
 
 var socket = io();
-socket.on('github', function (data) {
+socket.on('github', function(data) {
   $('.online-users-count').html(data.connected_users);
-  data.data.forEach(function(event){
-    if(!isEventInQueue(event)){
+  data.data.forEach(function(event) {
+    if (!isEventInQueue(event)) {
       // Filter out events only specified by the user
-      if(orgRepoFilterNames != []){
+      if (orgRepoFilterNames != []) {
         // Don't consider pushes to github.io repos when org filter is on
-        if(new RegExp(orgRepoFilterNames.join("|")).test(event.repo_name)
-           && event.repo_name.indexOf('github.io') == -1){
+        if (new RegExp(orgRepoFilterNames.join("|")).test(event.repo_name)
+           && event.repo_name.indexOf('github.io') == -1) {
           eventQueue.push(event);
         }
-      }else{
+      } else {
         eventQueue.push(event);
       }
     }
@@ -47,8 +47,8 @@ socket.on('github', function (data) {
   if (eventQueue.length > 1000) eventQueue = eventQueue.slice(0, 1000);
 });
 
-socket.on('connect', function(){
-    if(svg != null){
+socket.on('connect', function() {
+    if (svg != null) {
       $('svg').css('background-color', svg_background_color_online);
       $('header').css('background-color', svg_background_color_online);
       $('.offline-text').css('visibility', 'hidden');
@@ -57,8 +57,8 @@ socket.on('connect', function(){
     }
 });
 
-socket.on('disconnect', function(){
-    if(svg != null){
+socket.on('disconnect', function() {
+    if (svg != null) {
       $('svg').css('background-color', svg_background_color_offline);
       $('header').css('background-color', svg_background_color_offline);
       $('.offline-text').css('visibility', 'visible');
@@ -68,8 +68,8 @@ socket.on('disconnect', function(){
     }
 });
 
-socket.on('error', function(){
-    if(svg != null){
+socket.on('error', function() {
+    if (svg != null) {
       $('svg').css('background-color', svg_background_color_offline);
       $('header').css('background-color', svg_background_color_offline);
       $('.offline-text').css('visibility', 'visible');
@@ -82,9 +82,9 @@ socket.on('error', function(){
 /**
 * This function checks whether an event is already in the queue
 */
-function isEventInQueue(event){
-  for(var i=0; i<eventQueue.length; i++){
-    if(eventQueue[i].id == event.id)
+function isEventInQueue(event) {
+  for (var i = 0; i < eventQueue.length; i++) {
+    if (eventQueue[i].id == event.id)
       return true;
   }
   return false;
@@ -95,7 +95,7 @@ function isEventInQueue(event){
  *
  * To extend this function, simply add return true for events that should be filtered.
  */
-function shouldEventBeIgnored(event){
+function shouldEventBeIgnored(event) {
   // This adds an easter egg to only play closed PRs
   if (!!ULTIMATE_DREAM_KILLER)
     return (event.type !== "PullRequestEvent" || event.action !== "closed");
@@ -104,24 +104,24 @@ function shouldEventBeIgnored(event){
 }
 
 
-$(function(){
+$(function() {
   element = document.documentElement;
   drawingArea = document.getElementsByTagName('#area')[0];
   width = window.innerWidth || element.clientWidth || drawingArea.clientWidth;
-  height = (window.innerHeight  - $('header').height())|| (element.clientHeight - $('header').height()) || (drawingArea.clientHeight - $('header').height());
+  height = (window.innerHeight - $('header').height()) || (element.clientHeight - $('header').height()) || (drawingArea.clientHeight - $('header').height());
   $('svg').css('background-color', svg_background_color_online);
   $('header').css('background-color', svg_background_color_online);
   $('svg text').css('color', svg_text_color);
   $('#volumeSlider').slider({
     'max': 100,
     'min': 0,
-    'value': volume*100,
-    'slide' : function(event, ui){
-      volume = ui.value/100.0;
+    'value': volume * 100,
+    'slide': function(event, ui) {
+      volume = ui.value / 100.0;
       Howler.volume(volume);
     },
-    'change' : function(event, ui){
-      volume = ui.value/100.0;
+    'change': function(event, ui) {
+      volume = ui.value / 100.0;
       Howler.volume(volume);
     }
   });
@@ -134,7 +134,7 @@ $(function(){
   // For window resizes
   var update_window = function() {
       width = window.innerWidth || element.clientWidth || drawingArea.clientWidth;
-      height = (window.innerHeight  - $('header').height())|| (element.clientHeight - $('header').height()) || (drawingArea.clientHeight - $('header').height());
+      height = (window.innerHeight - $('header').height()) || (element.clientHeight - $('header').height()) || (drawingArea.clientHeight - $('header').height());
       svg.attr("width", width).attr("height", height);
   };
   window.onresize = update_window;
@@ -158,27 +158,27 @@ $(function(){
           fn = 'c00' + i;
       }
       celesta.push(new Howl({
-          src : ['https://d1fz9d31zqor6x.cloudfront.net/sounds/celesta/' + fn + '.ogg',
+          src: ['https://d1fz9d31zqor6x.cloudfront.net/sounds/celesta/' + fn + '.ogg',
                   'https://d1fz9d31zqor6x.cloudfront.net/sounds/celesta/' + fn + '.mp3'],
-          volume : 0.7,
-          onload : sound_load(),
+          volume: 0.7,
+          onload: sound_load(),
           buffer: true,
       }));
       clav.push(new Howl({
-          src : ['https://d1fz9d31zqor6x.cloudfront.net/sounds/clav/' + fn + '.ogg',
+          src: ['https://d1fz9d31zqor6x.cloudfront.net/sounds/clav/' + fn + '.ogg',
                   'https://d1fz9d31zqor6x.cloudfront.net/sounds/clav/' + fn + '.mp3'],
-          volume : 0.4,
-          onload : sound_load(),
+          volume: 0.4,
+          onload: sound_load(),
           buffer: true,
       }));
   }
 
   for (var i = 1; i <= 3; i++) {
       swells.push(new Howl({
-          src : ['https://d1fz9d31zqor6x.cloudfront.net/sounds/swells/swell' + i + '.ogg',
+          src: ['https://d1fz9d31zqor6x.cloudfront.net/sounds/swells/swell' + i + '.ogg',
                   'https://d1fz9d31zqor6x.cloudfront.net/sounds/swells/swell' + i + '.mp3'],
-          volume : 1,
-          onload : sound_load(),
+          volume: 1,
+          onload: sound_load(),
           buffer: true,
       }));
   }
@@ -221,9 +221,9 @@ function playSound(size, type) {
         current_notes++;
         if (type == 'IssuesEvent' || type == 'IssueCommentEvent') {
             clav[index].play();
-        } else if(type == 'PushEvent') {
+        } else if (type == 'PushEvent') {
             celesta[index].play();
-        }else{
+        } else {
           playRandomSwell();
         }
         setTimeout(function() {
@@ -235,22 +235,22 @@ function playSound(size, type) {
 // Following are the n numbers of event consumers
 // consuming n events each per second with a random delay between them
 
-function playFromQueueExchange1(){
+function playFromQueueExchange1() {
   var event = eventQueue.shift();
-  if(event != null && event.message != null && !shouldEventBeIgnored(event) && svg != null){
-    playSound(event.message.length*1.1, event.type);
-    if(!document.hidden)
+  if (event != null && event.message != null && !shouldEventBeIgnored(event) && svg != null) {
+    playSound(event.message.length * 1.1, event.type);
+    if (!document.hidden)
       drawEvent(event, svg);
   }
   setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1000) + 500);
   $('.events-remaining-value').html(eventQueue.length);
 }
 
-function playFromQueueExchange2(){
+function playFromQueueExchange2() {
   var event = eventQueue.shift();
-  if(event != null && event.message != null && !shouldEventBeIgnored(event) && svg != null){
+  if (event != null && event.message != null && !shouldEventBeIgnored(event) && svg != null) {
     playSound(event.message.length, event.type);
-    if(!document.hidden)
+    if (!document.hidden)
       drawEvent(event, svg);
   }
   setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 800) + 500);
@@ -258,12 +258,12 @@ function playFromQueueExchange2(){
 }
 
 // This method capitalizes the string in place
-String.prototype.capitalize=function(all){
-    if(all){
-      return this.split(' ').map(function(e){
+String.prototype.capitalize = function(all) {
+    if (all) {
+      return this.split(' ').map(function(e) {
         return e.capitalize().join(' ');
       });
-    }else{
+    } else {
          return this.charAt(0).toUpperCase() + this.slice(1);
     }
 };
@@ -280,7 +280,7 @@ function drawEvent(data, svg_area) {
     var ring_radius = 80;
     var ring_anim_duration = 3000;
     svg_text_color = '#FFFFFF';
-    switch(data.type){
+    switch (data.type) {
       case "PushEvent":
         label_text = data.user.capitalize() + " pushed to " + data.repo_name;
         edit_color = '#B2DFDB';
@@ -368,7 +368,7 @@ function drawEvent(data, svg_area) {
 
   // Remove HTML of decayed events
   // Keep it less than 50
-  if($('#area svg g').length > 50){
+  if ($('#area svg g').length > 50) {
     $('#area svg g:lt(10)').remove();
   }
 }
