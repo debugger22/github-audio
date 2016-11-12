@@ -162,14 +162,14 @@ $(function() {
                   'https://d1fz9d31zqor6x.cloudfront.net/sounds/celesta/' + fn + '.mp3'],
           volume: 0.7,
           onload: sound_load(),
-          buffer: true,
+          buffer: true
       }));
       clav.push(new Howl({
           src: ['https://d1fz9d31zqor6x.cloudfront.net/sounds/clav/' + fn + '.ogg',
                   'https://d1fz9d31zqor6x.cloudfront.net/sounds/clav/' + fn + '.mp3'],
           volume: 0.4,
           onload: sound_load(),
-          buffer: true,
+          buffer: true
       }));
   }
 
@@ -179,7 +179,7 @@ $(function() {
                   'https://d1fz9d31zqor6x.cloudfront.net/sounds/swells/swell' + i + '.mp3'],
           volume: 1,
           onload: sound_load(),
-          buffer: true,
+          buffer: true
       }));
   }
 
