@@ -88,7 +88,6 @@ function fetchDataFromGithub() {
           });
         }
       });
-
     } else {
       logger.error('GitHub status code: ' + response.statusCode);
     }
@@ -96,7 +95,6 @@ function fetchDataFromGithub() {
   setTimeout(fetchDataFromGithub, 2000);
 }
 setTimeout(fetchDataFromGithub, 2000);
-
 
 function stripData(data) {
   var stripedData = [];

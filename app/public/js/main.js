@@ -24,8 +24,6 @@ var celesta = [],
   clav = [],
   swells = [];
 
-
-
 var socket = io();
 socket.on('github', function(data) {
   $('.online-users-count').html(data.connectedUsers);
@@ -64,7 +62,6 @@ socket.on('disconnect', function() {
     $('.offline-text').css('visibility', 'visible');
     $('.events-remaining-text').css('visibility', 'visible');
     $('.events-remaining-value').css('visibility', 'visible');
-
   }
 });
 
@@ -77,7 +74,6 @@ socket.on('error', function() {
     $('.events-remaining-value').css('visibility', 'visible');
   }
 });
-
 
 /**
  * This function checks whether an event is already in the queue
@@ -102,7 +98,6 @@ function shouldEventBeIgnored(event) {
 
   return false;
 }
-
 
 $(function() {
   element = document.documentElement;
@@ -192,9 +187,7 @@ $(function() {
     orgRepoFilterNames = $('#org-repo-filter-name').val().split(' ');
     eventQueue = [];
   });
-
 });
-
 
 /**
  * Randomly selects a swell sound and plays it
@@ -203,7 +196,6 @@ function playRandomSwell() {
   var index = Math.round(Math.random() * (swells.length - 1));
   swells[index].play();
 }
-
 
 /**
  * Plays a sound(celesta and clav) based on passed parameters
@@ -268,7 +260,6 @@ String.prototype.capitalize = function(all) {
   }
 };
 
-
 function drawEvent(data, svgArea) {
   var startingOpacity = 1;
   var opacity = 1 / (100 / data.message.length);
@@ -311,12 +302,10 @@ function drawEvent(data, svgArea) {
   var x = Math.random() * (width - size) + size;
   var y = Math.random() * (height - size) + size;
 
-
   var circleGroup = svgArea.append('g')
     .attr('transform', 'translate(' + x + ', ' + y + ')')
     .attr('fill', editColor)
     .style('opacity', startingOpacity);
-
 
   var ring = circleGroup.append('circle');
   ring.attr({r: size, stroke: 'none'});
@@ -340,7 +329,6 @@ function drawEvent(data, svgArea) {
     .duration(maxLife)
     .style('opacity', 0)
     .remove();
-
 
   circleContainer.on('mouseover', function() {
     circleContainer.append('text')
