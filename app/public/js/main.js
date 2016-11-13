@@ -8,17 +8,17 @@ var volume = 0.6;
 var ULTIMATE_DREAM_KILLER = false;  // https://github.com/debugger22/github-audio/pull/19
 var orgRepoFilterNames = [];
 
-var scale_factor = 6,
-    note_overlap = 2,
-    note_timeout = 300,
-    current_notes = 0,
-    max_life = 20000;
+var scaleFactor = 6,
+    noteOverlap = 2,
+    noteTimeout = 300,
+    currentNotes = 0,
+    maxLife = 20000;
 
-var svg_background_color_online = '#0288D1',
-    svg_background_color_offline = '#E91E63',
-    svg_text_color = '#FFFFFF',
-    edit_color = '#fff',
-    total_sounds = 51;
+var svgBackgroundColorOnline = '#0288D1',
+    svgBackgroundColorOffline = '#E91E63',
+    svgTextColor = '#FFFFFF',
+    editColor = '#fff',
+    totalSounds = 51;
 
     var celesta = [],
         clav = [],
@@ -28,7 +28,7 @@ var svg_background_color_online = '#0288D1',
 
 var socket = io();
 socket.on('github', function(data) {
-  $('.online-users-count').html(data.connected_users);
+  $('.online-users-count').html(data.connectedUsers);
   data.data.forEach(function(event) {
     if (!isEventInQueue(event)) {
       // Filter out events only specified by the user
@@ -49,8 +49,8 @@ socket.on('github', function(data) {
 
 socket.on('connect', function() {
     if (svg != null) {
-      $('svg').css('background-color', svg_background_color_online);
-      $('header').css('background-color', svg_background_color_online);
+      $('svg').css('background-color', svgBackgroundColorOnline);
+      $('header').css('background-color', svgBackgroundColorOnline);
       $('.offline-text').css('visibility', 'hidden');
       $('.events-remaining-text').css('visibility', 'hidden');
       $('.events-remaining-value').css('visibility', 'hidden');
@@ -59,8 +59,8 @@ socket.on('connect', function() {
 
 socket.on('disconnect', function() {
     if (svg != null) {
-      $('svg').css('background-color', svg_background_color_offline);
-      $('header').css('background-color', svg_background_color_offline);
+      $('svg').css('background-color', svgBackgroundColorOffline);
+      $('header').css('background-color', svgBackgroundColorOffline);
       $('.offline-text').css('visibility', 'visible');
       $('.events-remaining-text').css('visibility', 'visible');
       $('.events-remaining-value').css('visibility', 'visible');
@@ -70,8 +70,8 @@ socket.on('disconnect', function() {
 
 socket.on('error', function() {
     if (svg != null) {
-      $('svg').css('background-color', svg_background_color_offline);
-      $('header').css('background-color', svg_background_color_offline);
+      $('svg').css('background-color', svgBackgroundColorOffline);
+      $('header').css('background-color', svgBackgroundColorOffline);
       $('.offline-text').css('visibility', 'visible');
       $('.events-remaining-text').css('visibility', 'visible');
       $('.events-remaining-value').css('visibility', 'visible');
@@ -109,9 +109,9 @@ $(function() {
   drawingArea = document.getElementsByTagName('#area')[0];
   width = window.innerWidth || element.clientWidth || drawingArea.clientWidth;
   height = (window.innerHeight - $('header').height()) || (element.clientHeight - $('header').height()) || (drawingArea.clientHeight - $('header').height());
-  $('svg').css('background-color', svg_background_color_online);
-  $('header').css('background-color', svg_background_color_online);
-  $('svg text').css('color', svg_text_color);
+  $('svg').css('background-color', svgBackgroundColorOnline);
+  $('header').css('background-color', svgBackgroundColorOnline);
+  $('svg text').css('color', svgTextColor);
   $('#volumeSlider').slider({
     'max': 100,
     'min': 0,
@@ -129,21 +129,21 @@ $(function() {
   // Main drawing area
   svg = d3.select("#area").append("svg");
   svg.attr({width: width, height: height});
-  svg.style('background-color', svg_background_color_online);
+  svg.style('background-color', svgBackgroundColorOnline);
 
   // For window resizes
-  var update_window = function() {
+  var updateWindow = function() {
       width = window.innerWidth || element.clientWidth || drawingArea.clientWidth;
       height = (window.innerHeight - $('header').height()) || (element.clientHeight - $('header').height()) || (drawingArea.clientHeight - $('header').height());
       svg.attr("width", width).attr("height", height);
   };
-  window.onresize = update_window;
-  update_window();
+  window.onresize = updateWindow;
+  updateWindow();
 
-  var loaded_sounds = 0;
-  var sound_load = function() {
-      loaded_sounds += 1;
-      if (loaded_sounds == total_sounds) {
+  var loadedSounds = 0;
+  var soundLoad = function() {
+      loadedSounds += 1;
+      if (loadedSounds == totalSounds) {
           setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1000));
           // Starting the second exchange makes music a bad experience
           // setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 2000));
@@ -161,14 +161,14 @@ $(function() {
           src: ['https://d1fz9d31zqor6x.cloudfront.net/sounds/celesta/' + fn + '.ogg',
                   'https://d1fz9d31zqor6x.cloudfront.net/sounds/celesta/' + fn + '.mp3'],
           volume: 0.7,
-          onload: sound_load(),
+          onload: soundLoad(),
           buffer: true
       }));
       clav.push(new Howl({
           src: ['https://d1fz9d31zqor6x.cloudfront.net/sounds/clav/' + fn + '.ogg',
                   'https://d1fz9d31zqor6x.cloudfront.net/sounds/clav/' + fn + '.mp3'],
           volume: 0.4,
-          onload: sound_load(),
+          onload: soundLoad(),
           buffer: true
       }));
   }
@@ -178,7 +178,7 @@ $(function() {
           src: ['https://d1fz9d31zqor6x.cloudfront.net/sounds/swells/swell' + i + '.ogg',
                   'https://d1fz9d31zqor6x.cloudfront.net/sounds/swells/swell' + i + '.mp3'],
           volume: 1,
-          onload: sound_load(),
+          onload: soundLoad(),
           buffer: true
       }));
   }
@@ -209,16 +209,16 @@ function playRandomSwell() {
 * Plays a sound(celesta and clav) based on passed parameters
 */
 function playSound(size, type) {
-    var max_pitch = 100.0;
-    var log_used = 1.0715307808111486871978099;
-    var pitch = 100 - Math.min(max_pitch, Math.log(size + log_used) / Math.log(log_used));
+    var maxPitch = 100.0;
+    var logUsed = 1.0715307808111486871978099;
+    var pitch = 100 - Math.min(maxPitch, Math.log(size + logUsed) / Math.log(logUsed));
     var index = Math.floor(pitch / 100.0 * Object.keys(celesta).length);
     var fuzz = Math.floor(Math.random() * 4) - 2;
     index += fuzz;
     index = Math.min(Object.keys(celesta).length - 1, index);
     index = Math.max(1, index);
-    if (current_notes < note_overlap) {
-        current_notes++;
+    if (currentNotes < noteOverlap) {
+        currentNotes++;
         if (type == 'IssuesEvent' || type == 'IssueCommentEvent') {
             clav[index].play();
         } else if (type == 'PushEvent') {
@@ -227,8 +227,8 @@ function playSound(size, type) {
           playRandomSwell();
         }
         setTimeout(function() {
-            current_notes--;
-        }, note_timeout);
+            currentNotes--;
+        }, noteTimeout);
     }
 }
 
@@ -269,82 +269,82 @@ String.prototype.capitalize = function(all) {
 };
 
 
-function drawEvent(data, svg_area) {
-    var starting_opacity = 1;
+function drawEvent(data, svgArea) {
+    var startingOpacity = 1;
     var opacity = 1 / (100 / data.message.length);
     if (opacity > 0.5) {
         opacity = 0.5;
     }
     var size = data.message.length;
-    var label_text;
-    var ring_radius = 80;
-    var ring_anim_duration = 3000;
-    svg_text_color = '#FFFFFF';
+    var labelText;
+    var ringRadius = 80;
+    var ringAnimDuration = 3000;
+    svgTextColor = '#FFFFFF';
     switch (data.type) {
       case "PushEvent":
-        label_text = data.user.capitalize() + " pushed to " + data.repo_name;
-        edit_color = '#B2DFDB';
+        labelText = data.user.capitalize() + " pushed to " + data.repo_name;
+        editColor = '#B2DFDB';
       break;
       case "PullRequestEvent":
-        label_text = data.user.capitalize() + " " +
+        labelText = data.user.capitalize() + " " +
           data.action + " " + " a PR for " + data.repo_name;
-          edit_color = '#C6FF00';
-          ring_anim_duration = 10000;
-          ring_radius = 600;
+          editColor = '#C6FF00';
+          ringAnimDuration = 10000;
+          ringRadius = 600;
       break;
       case "IssuesEvent":
-        label_text = data.user.capitalize() + " " +
+        labelText = data.user.capitalize() + " " +
           data.action + " an issue in " + data.repo_name;
-          edit_color = '#FFEB3B';
+          editColor = '#FFEB3B';
       break;
       case "IssueCommentEvent":
-        label_text = data.user.capitalize() + " commented in " + data.repo_name;
-        edit_color = '#FF5722';
+        labelText = data.user.capitalize() + " commented in " + data.repo_name;
+        editColor = '#FF5722';
       break;
     }
     var type = data.type;
 
-    var abs_size = Math.abs(size);
-    size = Math.max(Math.sqrt(abs_size) * scale_factor, 3);
+    var absSize = Math.abs(size);
+    size = Math.max(Math.sqrt(absSize) * scaleFactor, 3);
 
     Math.seedrandom(data.message);
     var x = Math.random() * (width - size) + size;
     var y = Math.random() * (height - size) + size;
 
 
-    var circle_group = svg_area.append('g')
+    var circleGroup = svgArea.append('g')
         .attr('transform', 'translate(' + x + ', ' + y + ')')
-        .attr('fill', edit_color)
-        .style('opacity', starting_opacity);
+        .attr('fill', editColor)
+        .style('opacity', startingOpacity);
 
 
-    var ring = circle_group.append('circle');
+    var ring = circleGroup.append('circle');
     ring.attr({r: size, stroke: 'none'});
     ring.transition()
-        .attr('r', size + ring_radius)
+        .attr('r', size + ringRadius)
         .style('opacity', 0)
         .ease(Math.sqrt)
-        .duration(ring_anim_duration)
+        .duration(ringAnimDuration)
         .remove();
 
-    var circle_container = circle_group.append('a');
-    circle_container.attr('xlink:href', data.url);
-    circle_container.attr('target', '_blank');
-    circle_container.attr('fill', svg_text_color);
+    var circleContainer = circleGroup.append('a');
+    circleContainer.attr('xlink:href', data.url);
+    circleContainer.attr('target', '_blank');
+    circleContainer.attr('fill', svgTextColor);
 
-    var circle = circle_container.append('circle');
+    var circle = circleContainer.append('circle');
     circle.classed(type, true);
     circle.attr('r', size)
-      .attr('fill', edit_color)
+      .attr('fill', editColor)
       .transition()
-      .duration(max_life)
+      .duration(maxLife)
       .style('opacity', 0)
       .remove();
 
 
-    circle_container.on('mouseover', function() {
-      circle_container.append('text')
-          .text(label_text)
+    circleContainer.on('mouseover', function() {
+      circleContainer.append('text')
+          .text(labelText)
           .classed('label', true)
           .attr('text-anchor', 'middle')
           .attr('font-size', '0.8em')
@@ -355,8 +355,8 @@ function drawEvent(data, svg_area) {
           .remove();
     });
 
-    circle_container.append('text')
-        .text(label_text)
+    circleContainer.append('text')
+        .text(labelText)
         .classed('article-label', true)
         .attr('text-anchor', 'middle')
         .attr('font-size', '0.8em')
