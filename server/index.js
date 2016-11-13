@@ -12,7 +12,7 @@ var helmet = require('helmet');  // To change response headers
 // To temporarily store JSON data from GitHub and also
 // the number of connected users
 var redis = require('redis'),
-    redisClient = redis.createClient();
+  redisClient = redis.createClient();
 
 var path = require('path');
 
@@ -53,10 +53,10 @@ io.on('connection', function(socket) {
   allClients.push(socket);
   redisClient.incr('connected_users');
   socket.on('disconnect', function() {
-     logger.v('Got disconnect!');
-     var i = allClients.indexOf(socket);
-     allClients.splice(i, 1);
-     redisClient.decr('connected_users');
+    logger.v('Got disconnect!');
+    var i = allClients.indexOf(socket);
+    allClients.splice(i, 1);
+    redisClient.decr('connected_users');
   });
   socket.on('error', function() {
     logger.error('Got errored!');
@@ -79,13 +79,13 @@ function fetchDataFromGithub() {
       var stripedData = stripData(data);  // Keep only useful keys
       allClients.forEach(function(socket) {
         if (socket != null && socket.connected == true) {
-            redisClient.get('connected_users', function(err, count) {
-                if (!err && count != null) {
-                    socket.volatile.json.emit('github', {data: stripedData, connectedUsers: count});
-                } else {
-                  logger.error(err.message);
-                }
-            });
+          redisClient.get('connected_users', function(err, count) {
+            if (!err && count != null) {
+              socket.volatile.json.emit('github', {data: stripedData, connectedUsers: count});
+            } else {
+              logger.error(err.message);
+            }
+          });
         }
       });
 
