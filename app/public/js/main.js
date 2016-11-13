@@ -34,7 +34,7 @@ socket.on('github', function(data) {
       // Filter out events only specified by the user
       if (orgRepoFilterNames != []) {
         // Don't consider pushes to github.io repos when org filter is on
-        if (new RegExp(orgRepoFilterNames.join("|")).test(event.repo_name)
+        if (new RegExp(orgRepoFilterNames.join('|')).test(event.repo_name)
            && event.repo_name.indexOf('github.io') == -1) {
           eventQueue.push(event);
         }
@@ -98,7 +98,7 @@ function isEventInQueue(event) {
 function shouldEventBeIgnored(event) {
   // This adds an easter egg to only play closed PRs
   if (!!ULTIMATE_DREAM_KILLER)
-    return (event.type !== "PullRequestEvent" || event.action !== "closed");
+    return (event.type !== 'PullRequestEvent' || event.action !== 'closed');
 
   return false;
 }
@@ -127,7 +127,7 @@ $(function() {
   });
 
   // Main drawing area
-  svg = d3.select("#area").append("svg");
+  svg = d3.select('#area').append('svg');
   svg.attr({width: width, height: height});
   svg.style('background-color', svgBackgroundColorOnline);
 
@@ -135,7 +135,7 @@ $(function() {
   var updateWindow = function() {
       width = window.innerWidth || element.clientWidth || drawingArea.clientWidth;
       height = (window.innerHeight - $('header').height()) || (element.clientHeight - $('header').height()) || (drawingArea.clientHeight - $('header').height());
-      svg.attr("width", width).attr("height", height);
+      svg.attr('width', width).attr('height', height);
   };
   window.onresize = updateWindow;
   updateWindow();
@@ -281,24 +281,24 @@ function drawEvent(data, svgArea) {
     var ringAnimDuration = 3000;
     svgTextColor = '#FFFFFF';
     switch (data.type) {
-      case "PushEvent":
-        labelText = data.user.capitalize() + " pushed to " + data.repo_name;
+      case 'PushEvent':
+        labelText = data.user.capitalize() + ' pushed to ' + data.repo_name;
         editColor = '#B2DFDB';
       break;
-      case "PullRequestEvent":
-        labelText = data.user.capitalize() + " " +
-          data.action + " " + " a PR for " + data.repo_name;
+      case 'PullRequestEvent':
+        labelText = data.user.capitalize() + ' ' +
+          data.action + ' ' + ' a PR for ' + data.repo_name;
           editColor = '#C6FF00';
           ringAnimDuration = 10000;
           ringRadius = 600;
       break;
-      case "IssuesEvent":
-        labelText = data.user.capitalize() + " " +
-          data.action + " an issue in " + data.repo_name;
+      case 'IssuesEvent':
+        labelText = data.user.capitalize() + ' ' +
+          data.action + ' an issue in ' + data.repo_name;
           editColor = '#FFEB3B';
       break;
-      case "IssueCommentEvent":
-        labelText = data.user.capitalize() + " commented in " + data.repo_name;
+      case 'IssueCommentEvent':
+        labelText = data.user.capitalize() + ' commented in ' + data.repo_name;
         editColor = '#FF5722';
       break;
     }

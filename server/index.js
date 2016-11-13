@@ -2,7 +2,7 @@
 
 var express = require('express');
 var app = express();
-var request = require("request");  // To make HTTP requests at the server side
+var request = require('request');  // To make HTTP requests at the server side
 
 var server = require('http').Server(app);
 var io = require('socket.io')(server);
@@ -11,7 +11,7 @@ var helmet = require('helmet');  // To change response headers
 
 // To temporarily store JSON data from GitHub and also
 // the number of connected users
-var redis = require("redis"),
+var redis = require('redis'),
     redisClient = redis.createClient();
 
 var path = require('path');
@@ -90,7 +90,7 @@ function fetchDataFromGithub() {
       });
 
     } else {
-      logger.error("GitHub status code: " + response.statusCode);
+      logger.error('GitHub status code: ' + response.statusCode);
     }
   });
   setTimeout(fetchDataFromGithub, 2000);
