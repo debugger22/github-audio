@@ -137,6 +137,7 @@ circle {
     font-size: 0.9em;
 	z-index: 1;
     opacity: 0.5;
+    visibility: hidden;
 }
 
 .online-users-text{
