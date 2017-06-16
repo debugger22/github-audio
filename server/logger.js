@@ -6,7 +6,6 @@ const ip = require('ip');
 const divider = chalk.gray('\n-----------------------------------');
 
 const logger = {
-
   // Called whenever there's an error on the server we want to print
   error: (err) => {
     console.error(chalk.red(err));
@@ -38,7 +37,7 @@ Localhost: ${chalk.magenta(`http://localhost:${port}`)}
 (tunnelStarted ? `\n    Proxy: ${chalk.magenta(tunnelStarted)}` : '')}${divider}
 ${chalk.blue(`Press ${chalk.italic('CTRL-C')} to stop`)}
     `);
-  },
+  }
 };
 
 module.exports = logger;
