@@ -89,6 +89,7 @@
         <span>Disclaimer: this project is not in any way affiliated with GitHub.</span><br/>
         this project is open source, you can view it on <a href="https://github.com/debugger22/github-audio" target="_blank">GitHub</a><br/>
         developed by <a href="https://github.com/debugger22" target="_blank">@debugger22</a><br/><br/>
+        <div id="coinwidget-bitcoin-37XgcaBrHibCMHzvZeZcj5mX5kYn8LUnui"></div>
         ProTip: It's actually kind of nice to leave on the background<br/><br/>
         <a href="https://www.digitalocean.com/" target="_blank"><img style="width:150px;cursor: pointer;" src="https://www.digitalocean.com/assets/media/logos-badges/DO_Powered_by_Badge_white-a05c38f6.png" alt="DigitalOcean" /></a>
       </div>
@@ -111,6 +112,27 @@
 
       ga('create', 'UA-84999786-1', 'auto');
       ga('send', 'pageview');
+    </script>
+    <script src="//blockr.io/js_external/coinwidget/coin.js"></script>
+    <script>
+      CoinWidgetCom.go({
+        wallet_address: '37XgcaBrHibCMHzvZeZcj5mX5kYn8LUnui',
+        currency: 'bitcoin',
+        counter: 'count',
+        lbl_button: 'Donate',
+        lbl_count: 'donations',
+        lbl_amount: 'BTC',
+        lbl_address: 'Use address below to donate. Thanks!',
+        qrcode: true,
+        alignment: 'bl',
+        decimals: 8,
+        size: "small",
+        color: "dark",
+        countdownFrom: "0",
+        element: "#coinwidget-bitcoin-37XgcaBrHibCMHzvZeZcj5mX5kYn8LUnui",
+        onShow: function(){},
+        onHide: function(){}
+      });
     </script>
   </body>
 </html>
