@@ -57,6 +57,7 @@ socket.on('connect', function(){
     if(svg != null){
       $('svg').css('background-color', svg_background_color_online);
       $('header').css('background-color', svg_background_color_online);
+      $('.online-users-div').css('visibility', 'visible');
       $('.offline-text').css('visibility', 'hidden');
       $('.events-remaining-text').css('visibility', 'hidden');
       $('.events-remaining-value').css('visibility', 'hidden');
@@ -67,6 +68,7 @@ socket.on('disconnect', function(){
     if(svg != null){
       $('svg').css('background-color', svg_background_color_offline);
       $('header').css('background-color', svg_background_color_offline);
+      $('.online-users-div').css('visibility', 'hidden');
       $('.offline-text').css('visibility', 'visible');
       $('.events-remaining-text').css('visibility', 'visible');
       $('.events-remaining-value').css('visibility', 'visible');
@@ -78,6 +80,7 @@ socket.on('error', function(){
     if(svg != null){
       $('svg').css('background-color', svg_background_color_offline);
       $('header').css('background-color', svg_background_color_offline);
+      $('.online-users-div').css('visibility', 'hidden');
       $('.offline-text').css('visibility', 'visible');
       $('.events-remaining-text').css('visibility', 'visible');
       $('.events-remaining-value').css('visibility', 'visible');
