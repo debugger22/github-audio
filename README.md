@@ -64,9 +64,13 @@ Note: Without the GitHub oauth key the number of requests is throttled at 60 per
 Run Redis and Server
 ----------
 
+If you are running locally then run local redis server
+
 ```bash
 $ redis-server
 ```
+
+On heroku, you can set up `Heroku Redis` add-on and it sets `REDIS_URL` enviornment variable.
 
 In a separate window:
 ```bash
@@ -74,4 +78,3 @@ $ node server
 ```
 
 Note: For production run `export NODE_ENV="production"` before starting the server.
-
