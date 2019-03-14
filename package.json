@@ -32,5 +32,8 @@
     "redis": "^2.6.2",
     "request": "^2.75.0",
     "socket.io": "^1.4.8"
+  },
+  "engines": {
+    "node": "4.x"
   }
 }

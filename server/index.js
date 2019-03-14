@@ -11,8 +11,12 @@ var helmet = require('helmet');  // To change response headers
 
 // To temporarily store JSON data from GitHub and also
 // the number of connected users
-var redis = require("redis"),
+var redis = require("redis");
+if (process.env.REDIS_URL) {
+    redis_client = redis.createClient(process.env.REDIS_URL);
+} else {
     redis_client = redis.createClient();
+}
 
 var path = require('path');
 
