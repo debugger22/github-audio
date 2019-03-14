@@ -38,3 +38,4 @@ jspm_packages
 
 # Optional for people who uses JetBrains products
 *.idea
+dump.rdb
