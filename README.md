@@ -70,7 +70,7 @@ If you are running locally then run local redis server
 $ redis-server
 ```
 
-On heroku, you can set up `Heroku Redis` add-on and it sets `REDIS_URL` enviornment variable.
+On heroku, you can set up `Heroku Redis` add-on and it sets `REDIS_URL` environment variable.
 
 In a separate window:
 ```bash
