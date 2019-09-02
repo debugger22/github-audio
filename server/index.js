@@ -108,12 +108,13 @@ function stripData(data){
   var IssueCommentEventCounter = 0;
   var IssuesEventCounter = 0;
   data.forEach(function(data){
-    if(data.type == 'PushEvent'){
+    var eventType = data.type;
+    if(eventType == 'PushEvent'){
       if(pushEventCounter > 3) return;
       if(data.payload.size != 0){
         stripedData.push({
           'id': data.id,
-          'type': data.type,
+          'type': eventType,
           'user': data.actor.display_login,
           'user_avatar': data.actor.avatar_url + 'v=3&s=64',
           'repo_id': data.repo.id,
@@ -125,24 +126,24 @@ function stripData(data){
         });
         pushEventCounter++;
       }
-    }else if(data.type == 'IssueCommentEvent'){
+    }else if(eventType == 'IssueCommentEvent' || eventType == 'PullRequestReviewCommentEvent' || eventType == 'CommitCommentEvent'){
       stripedData.push({
         'id': data.id,
-        'type': data.type,
+        'type': eventType,
         'user': data.actor.display_login,
         'user_avatar': data.actor.avatar_url + 'v=3&s=64',
         'repo_id': data.repo.id,
         'repo_name': data.repo.name,
         'payload_size': 0,
-        'message': data.body,
+        'message': data.payload.comment.body,
         'created': data.created_at,
         'url': data.payload.comment.html_url
       });
-    }else if(data.type == 'PullRequestEvent'){
+    }else if(eventType == 'PullRequestEvent'){
       if (data.payload.pull_request.merged) data.payload.action = 'merged';
       stripedData.push({
         'id': data.id,
-        'type': data.type,
+        'type': eventType,
         'user': data.actor.display_login,
         'user_avatar': data.actor.avatar_url + 'v=3&s=64',
         'repo_id': data.repo.id,
@@ -152,10 +153,10 @@ function stripData(data){
         'created': data.created_at,
         'url': data.payload.pull_request.html_url
       });
-    }else if(data.type == 'IssuesEvent'){
+    }else if(eventType == 'IssuesEvent'){
       stripedData.push({
         'id': data.id,
-        'type': data.type,
+        'type': eventType,
         'user': data.actor.display_login,
         'user_avatar': data.actor.avatar_url + 'v=3&s=64',
         'repo_id': data.repo.id,

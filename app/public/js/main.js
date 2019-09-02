@@ -31,7 +31,6 @@ var svg_background_color_online = '#0288D1',
         all_loaded = false;
 
 
-
 var socket = io();
 socket.on('github', function (data) {
   $('.online-users-count').html(data.connected_users);
@@ -147,7 +146,7 @@ $(function(){
   update_window();
 
   var loaded_sounds = 0;
-  var sound_load = function(r) {
+  var sound_load = function() {
       loaded_sounds += 1;
       if (loaded_sounds == total_sounds) {
           all_loaded = true;
@@ -226,7 +225,8 @@ function playSound(size, type) {
     index = Math.max(1, index);
     if (current_notes < note_overlap) {
         current_notes++;
-        if (type == 'IssuesEvent' || type == 'IssueCommentEvent') {
+        if (type == 'IssuesEvent' || type == 'IssueCommentEvent' || 
+            type == 'PullRequestReviewCommentEvent' || type == 'CommitCommentEvent') {
             clav[index].play();
         } else if(type == 'PushEvent') {
             celesta[index].play();
@@ -287,6 +287,7 @@ function drawEvent(data, svg_area) {
     var ring_radius = 80;
     var ring_anim_duration = 3000;
     svg_text_color = '#FFFFFF';
+
     switch(data.type){
       case "PushEvent":
         label_text = data.user.capitalize() + " pushed to " + data.repo_name;
@@ -305,6 +306,8 @@ function drawEvent(data, svg_area) {
           edit_color = '#FFEB3B';
       break;
       case "IssueCommentEvent":
+      case "PullRequestReviewCommentEvent":
+      case "CommitCommentEvent":
         label_text = data.user.capitalize() + " commented in " + data.repo_name;
         edit_color = '#FF5722';
       break;
