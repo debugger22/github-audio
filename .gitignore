@@ -40,3 +40,7 @@ jspm_packages
 *.idea
 
 dump.rdb
+
+*/target/
+
+.env
