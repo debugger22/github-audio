@@ -4,6 +4,10 @@ pub fn clean_gh_payload(events: Vec<Event>) -> String {
     let mut cleaned_events: Vec<EventForClient> = Vec::new();
 
     for event in events {
+        if event.actor.display_login == "github-actions" {
+            continue;
+        }
+
         // Convert repository URL to Github UI view
         let mut repo = event.repo;
         repo.url = repo
@@ -58,7 +62,7 @@ pub fn clean_gh_payload(events: Vec<Event>) -> String {
                         .url
                         .replace("/api.github", "/github")
                         .replace("/repos/", "/")
-                        .replace("/pulls/", "/pull");
+                        .replace("/pulls/", "/pull/");
 
                     cleaned_events.push(EventForClient {
                         r#type: event.r#type,
@@ -69,6 +73,21 @@ pub fn clean_gh_payload(events: Vec<Event>) -> String {
                         actor,
                     });
                 }
+            }
+
+            "IssueCommentEvent" => {
+                let event_url = event.payload["comment"].as_object().unwrap()["html_url"]
+                    .as_str()
+                    .unwrap();
+
+                cleaned_events.push(EventForClient {
+                    r#type: event.r#type,
+                    pr_action: "".to_string(),
+                    event_url: event_url.to_string(),
+                    commits_size: 0,
+                    repo,
+                    actor,
+                });
             }
 
             _ => {}
