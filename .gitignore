@@ -39,4 +39,9 @@ jspm_packages
 # Optional for people who uses JetBrains products
 *.idea
 
-dump.rdb
+*/target/
+
+.env
+
+Dockerfile
+docker-compose.yml

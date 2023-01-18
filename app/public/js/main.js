@@ -1,10 +1,11 @@
 var eventQueue = [];
+var startConsuming = false;
 var svg;
 var element;
 var drawingArea;
 var width;
 var height;
-var volume = 0.6;
+var volume = 0.5;
 var ULTIMATE_DREAM_KILLER = false;  // https://github.com/debugger22/github-audio/pull/19
 var orgRepoFilterNames = [];
 
@@ -14,7 +15,7 @@ var scale_factor = 6,
     current_notes = 0,
     max_life = 20000;
 
-var svg_background_color_online = '#0288D1',
+var svg_background_color_online = '#32746D', //'#0288D1',
     svg_background_color_offline = '#E91E63',
     svg_text_color = '#FFFFFF',
     newuser_box_color = 'rgb(41, 128, 185)',
@@ -31,29 +32,29 @@ var svg_background_color_online = '#0288D1',
         all_loaded = false;
 
 
+const ws = new WebSocket('ws://localhost:8000/events/');
 
-var socket = io();
-socket.on('github', function (data) {
-  $('.online-users-count').html(data.connected_users);
-  data.data.forEach(function(event){
-    if(!isEventInQueue(event)){
-      // Filter out events only specified by the user
-      if(orgRepoFilterNames != []){
-        // Don't consider pushes to github.io repos when org filter is on
-        if(new RegExp(orgRepoFilterNames.join("|")).test(event.repo_name)
-           && event.repo_name.indexOf('github.io') == -1){
-          eventQueue.push(event);
-        }
-      }else{
+ws.addEventListener('message', (event) => {
+  var events = JSON.parse(event.data);
+  console.log(events);
+  // $('.online-users-count').html(data.connected_users);
+  events.forEach(function(event){
+    // Filter out events only specified by the user
+    if(orgRepoFilterNames != []){
+      // Don't consider pushes to github.io repos when org filter is on
+      if(new RegExp(orgRepoFilterNames.join("|")).test(event.repo.name)
+          && event.repo.name.indexOf('github.io') == -1){
         eventQueue.push(event);
       }
+    }else{
+      eventQueue.push(event);
     }
   });
-  // Don't let the eventQueue grow more than 1000
-  if (eventQueue.length > 1000) eventQueue = eventQueue.slice(0, 1000);
+  // Don't let the eventQueue grow more than 128
+  if (eventQueue.length > 128) eventQueue = eventQueue.slice(0, 128);
 });
 
-socket.on('connect', function(){
+ws.addEventListener('open', (event) => {
     if(svg != null){
       $('svg').css('background-color', svg_background_color_online);
       $('header').css('background-color', svg_background_color_online);
@@ -63,7 +64,7 @@ socket.on('connect', function(){
     }
 });
 
-socket.on('disconnect', function(){
+ws.addEventListener('close', (event) => {
     if(svg != null){
       $('svg').css('background-color', svg_background_color_offline);
       $('header').css('background-color', svg_background_color_offline);
@@ -74,7 +75,7 @@ socket.on('disconnect', function(){
     }
 });
 
-socket.on('error', function(){
+ws.addEventListener('error', (event) => {
     if(svg != null){
       $('svg').css('background-color', svg_background_color_offline);
       $('header').css('background-color', svg_background_color_offline);
@@ -83,18 +84,6 @@ socket.on('error', function(){
       $('.events-remaining-value').css('visibility', 'visible');
     }
 });
-
-
-/**
-* This function checks whether an event is already in the queue
-*/
-function isEventInQueue(event){
-  for(var i=0; i<eventQueue.length; i++){
-    if(eventQueue[i].id == event.id)
-      return true;
-  }
-  return false;
-}
 
 /**
  * This function adds a filter for events that we don't want to hear.
@@ -151,9 +140,7 @@ $(function(){
       loaded_sounds += 1;
       if (loaded_sounds == total_sounds) {
           all_loaded = true;
-          setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1000));
-          // Starting the second exchange makes music a bad experience
-          // setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 2000));
+          setTimeout(playFromQueue, Math.floor(Math.random() * 1000));
       }
   }
 
@@ -242,25 +229,20 @@ function playSound(size, type) {
 // Following are the n numbers of event consumers
 // consuming n events each per second with a random delay between them
 
-function playFromQueueExchange1(){
+function playFromQueue(){
+  if (!startConsuming) {
+    setTimeout(playFromQueue, Math.floor(Math.random() * 1000) + 500);
+    return;
+  }
   var event = eventQueue.shift();
-  if(event != null && event.message != null && !shouldEventBeIgnored(event) && svg != null){
-    playSound(event.message.length*1.1, event.type);
+  if(event != null && event.actor.display_login != null && !shouldEventBeIgnored(event) && svg != null){
+    playSound(event.actor.display_login.length*1.1, event.type);
     if(!document.hidden)
       drawEvent(event, svg);
+  }else{
+    console.log("Ignored ex 1");
   }
-  setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1000) + 500);
-  $('.events-remaining-value').html(eventQueue.length);
-}
-
-function playFromQueueExchange2(){
-  var event = eventQueue.shift();
-  if(event != null && event.message != null && !shouldEventBeIgnored(event) && svg != null){
-    playSound(event.message.length, event.type);
-    if(!document.hidden)
-      drawEvent(event, svg);
-  }
-  setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 800) + 500);
+  setTimeout(playFromQueue, Math.floor(Math.random() * 1000) + 500);
   $('.events-remaining-value').html(eventQueue.length);
 }
 
@@ -278,35 +260,35 @@ String.prototype.capitalize=function(all){
 
 function drawEvent(data, svg_area) {
     var starting_opacity = 1;
-    var opacity = 1 / (100 / data.message.length);
+    var opacity = 1 / (100 / data.actor.display_login.length);
     if (opacity > 0.5) {
         opacity = 0.5;
     }
-    var size = data.message.length;
+    var size = data.actor.display_login.length;
     var label_text;
     var ring_radius = 80;
     var ring_anim_duration = 3000;
     svg_text_color = '#FFFFFF';
     switch(data.type){
       case "PushEvent":
-        label_text = data.user.capitalize() + " pushed to " + data.repo_name;
-        edit_color = '#B2DFDB';
+        label_text = data.actor.display_login.capitalize() + " pushed to " + data.repo.name;
+        edit_color = '#FFF9A5';
       break;
       case "PullRequestEvent":
-        label_text = data.user.capitalize() + " " +
-          data.action + " " + " a PR for " + data.repo_name;
+        label_text = data.actor.display_login.capitalize() + " " +
+          data.action + " " + " a PR for " + data.repo.name;
           edit_color = '#C6FF00';
           ring_anim_duration = 10000;
           ring_radius = 600;
       break;
       case "IssuesEvent":
-        label_text = data.user.capitalize() + " " +
-          data.action + " an issue in " + data.repo_name;
-          edit_color = '#FFEB3B';
+        label_text = data.actor.display_login.capitalize() + " " +
+          data.action + " an issue in " + data.repo.name;
+          edit_color = '#DFEFCA';
       break;
       case "IssueCommentEvent":
-        label_text = data.user.capitalize() + " commented in " + data.repo_name;
-        edit_color = '#FF5722';
+        label_text = data.actor.display_login.capitalize() + " " + data.action + " in " + data.repo.name;
+        edit_color = '#CCDDD3';
       break;
     }
     var csize = size;
@@ -317,7 +299,7 @@ function drawEvent(data, svg_area) {
     var abs_size = Math.abs(size);
     size = Math.max(Math.sqrt(abs_size) * scale_factor, 3);
 
-    Math.seedrandom(data.message)
+    Math.seedrandom(data.event_url)
     var x = Math.random() * (width - size) + size;
     var y = Math.random() * (height - size) + size;
 
@@ -338,7 +320,7 @@ function drawEvent(data, svg_area) {
         .remove();
 
     var circle_container = circle_group.append('a');
-    circle_container.attr('xlink:href', data.url);
+    circle_container.attr('xlink:href', data.event_url);
     circle_container.attr('target', '_blank');
     circle_container.attr('fill', svg_text_color);
 
@@ -357,20 +339,20 @@ function drawEvent(data, svg_area) {
           .text(label_text)
           .classed('label', true)
           .attr('text-anchor', 'middle')
-          .attr('font-size', '0.8em')
+          .attr('y', '0.3em')
           .transition()
-          .delay(1000)
+          .delay(10)
           .style('opacity', 0)
-          .duration(2000)
+          .duration(200)
           .each(function() { no_label = true; })
           .remove();
     });
 
-    var text = circle_container.append('text')
+    circle_container.append('text')
         .text(label_text)
         .classed('article-label', true)
         .attr('text-anchor', 'middle')
-        .attr('font-size', '0.8em')
+        .attr('y', '0.3em')
         .transition()
         .delay(2000)
         .style('opacity', 0)
@@ -383,4 +365,18 @@ function drawEvent(data, svg_area) {
   if($('#area svg g').length > 50){
     $('#area svg g:lt(10)').remove();
   }
+}
+
+
+function playButtonHover(e){
+  e.setAttribute('src', '/public/images/play-button-hover.svg');
+}
+
+function playButtonUnhover(e){
+  e.setAttribute('src', '/public/images/play-button.svg');
+}
+
+function playButtonClick(e) {
+  startConsuming = true;
+  $('#clickToPlay').remove();
 }
