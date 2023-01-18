@@ -4,7 +4,8 @@ pub fn clean_gh_payload(events: Vec<Event>) -> String {
     let mut cleaned_events: Vec<EventForClient> = Vec::new();
 
     for event in events {
-        if event.actor.display_login == "github-actions" {
+        // Avoid pushing actions done by bots
+        if check_for_bot(&event.actor.display_login) {
             continue;
         }
 
@@ -43,7 +44,7 @@ pub fn clean_gh_payload(events: Vec<Event>) -> String {
                     }
                     cleaned_events.push(EventForClient {
                         r#type: event.r#type,
-                        pr_action: "".to_string(),
+                        action: "".to_string(),
                         event_url: commit_url,
                         commits_size,
                         repo,
@@ -66,7 +67,7 @@ pub fn clean_gh_payload(events: Vec<Event>) -> String {
 
                     cleaned_events.push(EventForClient {
                         r#type: event.r#type,
-                        pr_action: pull_req_payload.action,
+                        action: pull_req_payload.action,
                         event_url: pull_req_url,
                         commits_size: 0,
                         repo,
@@ -76,18 +77,37 @@ pub fn clean_gh_payload(events: Vec<Event>) -> String {
             }
 
             "IssueCommentEvent" => {
-                let event_url = event.payload["comment"].as_object().unwrap()["html_url"]
-                    .as_str()
-                    .unwrap();
+                if let Some(comment) = event.payload["comment"].as_object() {
+                    if let Some(event_url) = comment["html_url"].as_str() {
+                        cleaned_events.push(EventForClient {
+                            r#type: event.r#type,
+                            action: "commented".to_string(),
+                            event_url: event_url.to_string(),
+                            commits_size: 0,
+                            repo,
+                            actor,
+                        });
+                    }
+                }
+            }
 
-                cleaned_events.push(EventForClient {
-                    r#type: event.r#type,
-                    pr_action: "".to_string(),
-                    event_url: event_url.to_string(),
-                    commits_size: 0,
-                    repo,
-                    actor,
-                });
+            "IssuesEvent" => {
+                if let Some(payload) = event.payload["payload"].as_object() {
+                    if let Some(action) = payload["action"].as_str() {
+                        if let Some(issue) = payload["issue"].as_object() {
+                            if let Some(event_url) = issue["html_url"].as_str() {
+                                cleaned_events.push(EventForClient {
+                                    r#type: event.r#type,
+                                    action: action.to_string(),
+                                    event_url: event_url.to_string(),
+                                    commits_size: 0,
+                                    repo,
+                                    actor,
+                                });
+                            }
+                        }
+                    }
+                }
             }
 
             _ => {}
@@ -100,4 +120,13 @@ pub fn clean_gh_payload(events: Vec<Event>) -> String {
         eprintln!("Error processing Github payload");
         return "".to_string();
     }
+}
+
+fn check_for_bot(actor_display_name: &String) -> bool {
+    actor_display_name
+        .to_lowercase()
+        .find("github-actions")
+        .is_some()
+        | actor_display_name.to_lowercase().find("bot").is_some()
+        | actor_display_name.to_lowercase().find("codecov").is_some()
 }

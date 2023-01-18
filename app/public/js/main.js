@@ -14,7 +14,7 @@ var scale_factor = 6,
     current_notes = 0,
     max_life = 20000;
 
-var svg_background_color_online = '#0288D1',
+var svg_background_color_online = '#32746D', //'#0288D1',
     svg_background_color_offline = '#E91E63',
     svg_text_color = '#FFFFFF',
     newuser_box_color = 'rgb(41, 128, 185)',
@@ -49,8 +49,8 @@ ws.addEventListener('message', (event) => {
       eventQueue.push(event);
     }
   });
-  // Don't let the eventQueue grow more than 1000
-  if (eventQueue.length > 1000) eventQueue = eventQueue.slice(0, 1000);
+  // Don't let the eventQueue grow more than 128
+  if (eventQueue.length > 128) eventQueue = eventQueue.slice(0, 128);
 });
 
 ws.addEventListener('open', (event) => {
@@ -282,23 +282,23 @@ function drawEvent(data, svg_area) {
     switch(data.type){
       case "PushEvent":
         label_text = data.actor.display_login.capitalize() + " pushed to " + data.repo.name;
-        edit_color = '#B2DFDB';
+        edit_color = '#FFF9A5';
       break;
       case "PullRequestEvent":
         label_text = data.actor.display_login.capitalize() + " " +
-          data.pr_action + " " + " a PR for " + data.repo.name;
+          data.action + " " + " a PR for " + data.repo.name;
           edit_color = '#C6FF00';
           ring_anim_duration = 10000;
           ring_radius = 600;
       break;
-      // case "IssuesEvent":
-      //   label_text = data.actor.display_login.capitalize() + " " +
-      //     data.action + " an issue in " + data.repo_name;
-      //     edit_color = '#FFEB3B';
-      // break;
+      case "IssuesEvent":
+        label_text = data.actor.display_login.capitalize() + " " +
+          data.action + " an issue in " + data.repo.name;
+          edit_color = '#DFEFCA';
+      break;
       case "IssueCommentEvent":
-        label_text = data.actor.display_login.capitalize() + " commented in " + data.repo.name;
-        edit_color = '#FF5722';
+        label_text = data.actor.display_login.capitalize() + " " + data.action + " in " + data.repo.name;
+        edit_color = '#CCDDD3';
       break;
     }
     var csize = size;
@@ -349,20 +349,20 @@ function drawEvent(data, svg_area) {
           .text(label_text)
           .classed('label', true)
           .attr('text-anchor', 'middle')
-          .attr('font-size', '0.8em')
+          .attr('y', '0.3em')
           .transition()
-          .delay(1000)
+          .delay(10)
           .style('opacity', 0)
-          .duration(2000)
+          .duration(200)
           .each(function() { no_label = true; })
           .remove();
     });
 
-    var text = circle_container.append('text')
+    circle_container.append('text')
         .text(label_text)
         .classed('article-label', true)
         .attr('text-anchor', 'middle')
-        .attr('font-size', '0.8em')
+        .attr('y', '0.3em')
         .transition()
         .delay(2000)
         .style('opacity', 0)
