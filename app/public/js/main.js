@@ -1,10 +1,11 @@
 var eventQueue = [];
+var startConsuming = false;
 var svg;
 var element;
 var drawingArea;
 var width;
 var height;
-var volume = 0.6;
+var volume = 0.5;
 var ULTIMATE_DREAM_KILLER = false;  // https://github.com/debugger22/github-audio/pull/19
 var orgRepoFilterNames = [];
 
@@ -139,9 +140,7 @@ $(function(){
       loaded_sounds += 1;
       if (loaded_sounds == total_sounds) {
           all_loaded = true;
-          setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1000));
-          // Starting the second exchange makes music a bad experience
-          // setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 2000));
+          setTimeout(playFromQueue, Math.floor(Math.random() * 1000));
       }
   }
 
@@ -230,7 +229,11 @@ function playSound(size, type) {
 // Following are the n numbers of event consumers
 // consuming n events each per second with a random delay between them
 
-function playFromQueueExchange1(){
+function playFromQueue(){
+  if (!startConsuming) {
+    setTimeout(playFromQueue, Math.floor(Math.random() * 1000) + 500);
+    return;
+  }
   var event = eventQueue.shift();
   if(event != null && event.actor.display_login != null && !shouldEventBeIgnored(event) && svg != null){
     playSound(event.actor.display_login.length*1.1, event.type);
@@ -239,20 +242,7 @@ function playFromQueueExchange1(){
   }else{
     console.log("Ignored ex 1");
   }
-  setTimeout(playFromQueueExchange1, Math.floor(Math.random() * 1000) + 500);
-  $('.events-remaining-value').html(eventQueue.length);
-}
-
-function playFromQueueExchange2(){
-  var event = eventQueue.shift();
-  if(event != null && event.actor.display_login != null && !shouldEventBeIgnored(event) && svg != null){
-    playSound(event.actor.display_login.length, event.type);
-    if(!document.hidden)
-      drawEvent(event, svg);
-  }else{
-    console.log("Ignored ex 2");
-  }
-  setTimeout(playFromQueueExchange2, Math.floor(Math.random() * 800) + 500);
+  setTimeout(playFromQueue, Math.floor(Math.random() * 1000) + 500);
   $('.events-remaining-value').html(eventQueue.length);
 }
 
@@ -375,4 +365,18 @@ function drawEvent(data, svg_area) {
   if($('#area svg g').length > 50){
     $('#area svg g:lt(10)').remove();
   }
+}
+
+
+function playButtonHover(e){
+  e.setAttribute('src', '/public/images/play-button-hover.svg');
+}
+
+function playButtonUnhover(e){
+  e.setAttribute('src', '/public/images/play-button.svg');
+}
+
+function playButtonClick(e) {
+  startConsuming = true;
+  $('#clickToPlay').remove();
 }

@@ -39,6 +39,15 @@
     <script src="/public/js/main.js"></script>
   </head>
   <body>
+    <div class="click-to-play" id="clickToPlay">
+      <img
+        class="play-button"
+        src="/public/images/play-button.svg"
+        alt="Click to play"
+        onmouseover="playButtonHover(this);"
+        onmouseout="playButtonUnhover(this);"
+        onclick="playButtonClick(this);"/>
+    </div>
     <header>
       <h1 class="header-text">
         Project Audio for GitHub&nbsp;

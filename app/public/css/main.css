@@ -58,6 +58,26 @@ html,body{
     visibility: hidden;
 }
 
+.click-to-play{
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: rgba(0, 0, 0, 0.7);
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+}
+
+.play-button{
+    width: 30rem;
+    margin-top: 20rem;
+}
+
+.play-button:hover{
+    cursor: pointer;
+}
+
 header{
     position: relative;;
     width: 100%;
