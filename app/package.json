@@ -1,0 +1,33 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "Github Audio",
+  "main": "js/main.js",
+  "scripts": {
+    "build-dirs": "mkdir -p prod/public/js && mkdir -p prod/public/css && mkdir -p prod/public/images && mkdir -p prod/public/sounds",
+    "min-html": "html-minifier --collapse-whitespace index.html -o prod/index.html",
+    "min-js": "uglifyjs --compress --mangle -o prod/public/js/main.js -- public/js/main.js",
+    "min-css": "postcss public/css/main.css --no-map -u cssnano -o prod/public/css/main.css",
+    "copy-assets": "cp -R public/images prod/public && cp -R public/sounds prod/public",
+    "build-prod": "npm run -s build-dirs && npm run -s min-html && npm run -s min-js && npm run -s min-css && npm run -s copy-assets"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/debugger22/github-audio.git"
+  },
+  "author": "Sudhanshu Mishra",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/debugger22/github-audio/issues"
+  },
+  "homepage": "https://github.com/debugger22/github-audio#readme",
+  "dependencies": {
+    "html-minifier": "^4.0.0",
+    "uglify-js": "^3.17.4"
+  },
+  "devDependencies": {
+    "cssnano": "^5.1.14",
+    "postcss": "^8.4.21",
+    "postcss-cli": "^10.1.0"
+  }
+}

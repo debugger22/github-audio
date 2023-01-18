@@ -45,3 +45,4 @@ jspm_packages
 
 Dockerfile
 docker-compose.yml
+prod
