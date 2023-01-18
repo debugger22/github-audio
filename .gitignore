@@ -43,6 +43,4 @@ jspm_packages
 
 .env
 
-Dockerfile
-docker-compose.yml
 prod
