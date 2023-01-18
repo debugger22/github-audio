@@ -32,7 +32,7 @@ var svg_background_color_online = '#32746D', //'#0288D1',
         all_loaded = false;
 
 
-const ws = new WebSocket('wss://api.github.audio/events/');
+const ws = new WebSocket('wss://github-audio.fly.dev/events/');
 
 ws.addEventListener('message', (event) => {
   var events = JSON.parse(event.data);
