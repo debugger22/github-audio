@@ -44,29 +44,23 @@ const PlayButton = styled.img`
 const Header = styled.header<{ $isOnline: boolean }>`
   position: relative;
   width: 100%;
-  height: 75px;
-  color: #fff;
-  font-family: 'Inter', sans-serif;
-  padding: 20px;
+  padding: 20px 40px;
   z-index: 1000;
   transition: background-color 0.3s ease;
+  display: flex;
+  flex-direction: row-reverse;
+  align-items: center;
+
+  @media (max-width: 768px) {
+    padding: 10px 20px;
+  }
   
-  h1 {
-    float: left;
-    font-size: 1.6em;
-    line-height: 1em;
-    margin: 0;
-    
-    span {
-      font-size: 0.4em;
-      visibility: ${props => props.$isOnline ? 'hidden' : 'visible'};
-    }
+  .logo {
+    height: 60px;
+    width: auto;
   }
   
   input[type="range"] {
-    position: absolute;
-    top: 30px;
-    right: 40px;
     width: 100px;
     opacity: 0.3;
     transition: opacity 0.2s ease;
@@ -100,17 +94,16 @@ const MainArea = styled.div<{ $isOnline: boolean }>`
     margin: auto;
     background: conic-gradient(
       from 0deg,
-      #90D1CA 0%,
-      #7BCDC1 10%,
-      #129990 20%,
+      #FE7743 0%,
+      #F1BA88 20%,
       #6C4E4E 30%,
-      #CB0404 40%,
-      #D93C1B 50%,
-      #FE5D26 60%,
-      #FF7F35 70%,
-      #FF9B45 80%,
-      #927AF5 90%,
-      #4B70F5 100%
+      #3A59D1 40%,
+      #3D90D7 50%,
+      #0118D8 60%,
+      #7965C1 70%,
+      #483AA0 80%,
+      #CF0F47 90%,
+      #EA98DA 100%
     );
     animation: spinAndPulseBlob 30s cubic-bezier(0.77, 0, 0.175, 1) infinite,
                fadeBlob 15s ease-in-out infinite;
@@ -174,6 +167,11 @@ const Footer = styled.footer`
   text-align: center;
   color: #666;
   font-size: 0.9em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 10px;
 `;
 
 const App: React.FC = () => {
@@ -296,10 +294,6 @@ const App: React.FC = () => {
 
       <MainArea $isOnline={isOnline}>
         <Header $isOnline={isOnline}>
-          <h1>
-            Project Audio for GitHub&nbsp;
-            <span>offline</span>
-          </h1>
           <input
             type="range"
             min="0"
@@ -329,18 +323,25 @@ const App: React.FC = () => {
       </ConfigArea>
 
       <Footer>
-        <div>
-          <span>This project is not in any way affiliated with GitHub.</span><br/>
-          This project is open source, you can view it on{' '}
-          <a href="https://github.com/debugger22/github-audio" target="_blank" rel="noopener noreferrer">
-            GitHub
-          </a><br/>
-          Developed by{' '}
-          <a href="https://github.com/debugger22/github-audio" target="_blank" rel="noopener noreferrer">
-            @debugger22
-          </a><br/>
-          ProTip: It's actually kind of nice to leave on the background
-        </div>
+          <img
+            className="logo"
+            src="/images/logo-60.avif"
+            alt="GitHub Audio Logo"
+            width={60}
+            height={60}
+          />
+          <span>This project is not in any way affiliated with GitHub.</span>
+          <span>
+            <a href="https://github.com/debugger22/github-audio" target="_blank" rel="noopener noreferrer">
+              Source Code
+            </a>
+          </span>
+          <span>
+            Developed by{' '} <a href="https://github.com/debugger22" target="_blank" rel="noopener noreferrer">@debugger22</a>
+          </span>
+          <span>
+            ProTip: It's actually kind of nice to leave on the background
+          </span>
       </Footer>
     </AppContainer>
   );
