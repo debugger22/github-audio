@@ -304,6 +304,7 @@ const App: React.FC = () => {
             min="0"
             max="100"
             value={volume * 100}
+            aria-label="Volume"
             onChange={handleVolumeChange}
           />
         </Header>
