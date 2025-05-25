@@ -9,7 +9,7 @@ const AppContainer = styled.div`
   margin: 0;
   padding: 0;
   background-color: #000;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   font-weight: 400;
   font-size: 16px;
   overflow-x: hidden;
@@ -138,7 +138,7 @@ const ConfigArea = styled.div`
   min-height: 100px;
   padding: 40px;
   color: #555555;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
   font-weight: 400;
   
   .filter-section {
@@ -151,7 +151,7 @@ const ConfigArea = styled.div`
       padding: 8px 12px;
       border: 1px solid #ccc;
       border-radius: 4px;
-      font-family: 'Inter', sans-serif;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
     }
   }
   

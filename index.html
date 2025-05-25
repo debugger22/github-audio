@@ -34,7 +34,6 @@
     <!-- Google Fonts with optimizations -->
     <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
     <!-- Preload main script -->
     <link rel="modulepreload" href="/src/main.tsx">
@@ -42,6 +41,17 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- Load Inter font after page load to prevent render blocking -->
+    <script>
+      window.addEventListener('load', function() {
+        // Load Inter font asynchronously
+        const fontLink = document.createElement('link');
+        fontLink.href = 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap';
+        fontLink.rel = 'stylesheet';
+        document.head.appendChild(fontLink);
+      });
+    </script>
     
     <!-- Defer Google Analytics to not block rendering -->
     <script>
