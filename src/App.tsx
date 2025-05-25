@@ -176,7 +176,10 @@ const Footer = styled.footer`
 
 const App: React.FC = () => {
   const [showClickToPlay, setShowClickToPlay] = useState(true);
-  const [volume, setVolumeState] = useState(0.5);
+  const [volume, setVolumeState] = useState(() => {
+    const savedVolume = localStorage.getItem('github-audio-volume');
+    return savedVolume ? parseFloat(savedVolume) : 0.5;
+  });
   const [orgRepoFilter, setOrgRepoFilter] = useState('');
   const processedEventIdsRef = useRef<Set<string>>(new Set());
   const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -274,6 +277,7 @@ const App: React.FC = () => {
     const newVolume = parseFloat(e.target.value) / 100;
     setVolumeState(newVolume);
     setVolume(newVolume);
+    localStorage.setItem('github-audio-volume', newVolume.toString());
   };
 
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
