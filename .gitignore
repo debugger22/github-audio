@@ -48,3 +48,5 @@ prod
 .DS_Store
 
 dist/
+
+.vite/
