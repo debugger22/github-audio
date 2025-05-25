@@ -48,7 +48,7 @@ export const useWebSocket = (
         console.log('WebSocket disconnected');
       });
 
-      ws.addEventListener('error', (error) => {
+      ws.addEventListener('error', (_error) => {
         setIsOnline(false);
         // Suppress error logging since server is always available and this is likely a dev environment issue
         console.log('WebSocket connection attempt failed, retrying...');

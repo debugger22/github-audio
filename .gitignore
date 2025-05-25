@@ -46,3 +46,5 @@ jspm_packages
 prod
 
 .DS_Store
+
+dist/

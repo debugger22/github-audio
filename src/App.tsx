@@ -4,7 +4,7 @@ import { useWebSocket, GitHubEvent } from './hooks/useWebSocket';
 import { useAudio } from './hooks/useAudio';
 import Visualization from './components/Visualization';
 
-// Styled Components
+// Styled Components - Optimized to reduce DOM elements
 const AppContainer = styled.div`
   margin: 0;
   padding: 0;
@@ -40,6 +40,7 @@ const PlayButton = styled.img`
   }
 `;
 
+// Combined Header with all header elements
 const Header = styled.header<{ $isOnline: boolean }>`
   position: relative;
   width: 100%;
@@ -49,34 +50,35 @@ const Header = styled.header<{ $isOnline: boolean }>`
   padding: 20px;
   z-index: 1000;
   transition: background-color 0.3s ease;
-`;
-
-const HeaderText = styled.h1`
-  float: left;
-  font-size: 1.6em;
-  line-height: 1em;
-  margin: 0;
-`;
-
-const OfflineText = styled.span<{ $show: boolean }>`
-  font-size: 0.4em;
-  visibility: ${props => props.$show ? 'visible' : 'hidden'};
-`;
-
-const VolumeSlider = styled.input`
-  position: absolute;
-  top: 30px;
-  right: 40px;
-  width: 100px;
-  opacity: 0.3;
-  transition: opacity 0.2s ease;
-  cursor: pointer;
   
-  &:hover {
-    opacity: 0.9;
+  h1 {
+    float: left;
+    font-size: 1.6em;
+    line-height: 1em;
+    margin: 0;
+    
+    span {
+      font-size: 0.4em;
+      visibility: ${props => props.$isOnline ? 'hidden' : 'visible'};
+    }
+  }
+  
+  input[type="range"] {
+    position: absolute;
+    top: 30px;
+    right: 40px;
+    width: 100px;
+    opacity: 0.3;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+    
+    &:hover {
+      opacity: 0.9;
+    }
   }
 `;
 
+// Combined MainArea with blob background
 const MainArea = styled.div<{ $isOnline: boolean }>`
   width: 100%;
   position: relative;
@@ -84,74 +86,60 @@ const MainArea = styled.div<{ $isOnline: boolean }>`
   background-color: transparent;
   transition: background-color 0.3s ease;
   overflow: hidden;
-`;
-
-const BlobOuterContainer = styled.div`
-    width: 100%;
-    height: 100%;
+  
+  &::before {
+    content: '';
     position: absolute;
     top: 0;
     left: 0;
+    width: 80%;
+    height: 80%;
     z-index: 0;
     filter: blur(100px);
-`;
-
-const BlobInnerContainer = styled.div`
     border-radius: 99999px;
-    position: absolute;
-    inset: 0;
     margin: auto;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
     transform: scale(0.8);
-`;
-
-const Blob = styled.div`
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    inset: 0;
-    margin: auto;
     background: conic-gradient(
-        from 0deg,
-        #90D1CA 0%,
-        #7BCDC1 10%,
-        #129990 20%,
-        #6C4E4E 30%,
-        #CB0404 40%,
-        #D93C1B 50%,
-        #FE5D26 60%,
-        #FF7F35 70%,
-        #FF9B45 80%,
-        #927AF5 90%,
-        #4B70F5 100%
+      from 0deg,
+      #90D1CA 0%,
+      #7BCDC1 10%,
+      #129990 20%,
+      #6C4E4E 30%,
+      #CB0404 40%,
+      #D93C1B 50%,
+      #FE5D26 60%,
+      #FF7F35 70%,
+      #FF9B45 80%,
+      #927AF5 90%,
+      #4B70F5 100%
     );
     animation: spinAndPulseBlob 30s cubic-bezier(0.77, 0, 0.175, 1) infinite,
                fadeBlob 15s ease-in-out infinite;
+  }
 
-    @keyframes spinAndPulseBlob {
-        0% {
-            transform: rotate(0deg) scale(1.95);
-        }
-        50% {
-            transform: rotate(180deg) scale(2.05);
-        }
-        100% {
-            transform: rotate(360deg) scale(1.95);
-        }
+  @keyframes spinAndPulseBlob {
+    0% {
+      transform: rotate(0deg) scale(1.95);
     }
+    50% {
+      transform: rotate(180deg) scale(2.05);
+    }
+    100% {
+      transform: rotate(360deg) scale(1.95);
+    }
+  }
 
-    @keyframes fadeBlob {
-        0%, 100% {
-            opacity: 0.85;
-        }
-        50% {
-            opacity: 1;
-        }
+  @keyframes fadeBlob {
+    0%, 100% {
+      opacity: 0.85;
     }
+    50% {
+      opacity: 1;
+    }
+  }
 `;
 
+// Combined ConfigArea with all config elements
 const ConfigArea = styled.div`
   width: 100%;
   background: #FFFFFF;
@@ -160,25 +148,25 @@ const ConfigArea = styled.div`
   color: #555555;
   font-family: 'Inter', sans-serif;
   font-weight: 400;
-`;
-
-const FilterDiv = styled.div`
-  width: 50%;
-  margin: 0 auto 20px auto;
-  text-align: center;
-`;
-
-const FilterInput = styled.input`
-  width: 320px;
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-family: 'Inter', sans-serif;
-`;
-
-const SiteDescription = styled.div`
-  text-align: center;
-  margin-bottom: 20px;
+  
+  .filter-section {
+    width: 50%;
+    margin: 0 auto 20px auto;
+    text-align: center;
+    
+    input {
+      width: 320px;
+      padding: 8px 12px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-family: 'Inter', sans-serif;
+    }
+  }
+  
+  .description {
+    text-align: center;
+    margin-bottom: 20px;
+  }
 `;
 
 const Footer = styled.footer`
@@ -281,42 +269,37 @@ const App: React.FC = () => {
 
       <MainArea $isOnline={isOnline}>
         <Header $isOnline={isOnline}>
-            <HeaderText>
+          <h1>
             Project Audio for GitHub&nbsp;
-            <OfflineText $show={!isOnline}>offline</OfflineText>
-            </HeaderText>
-            <VolumeSlider
+            <span>offline</span>
+          </h1>
+          <input
             type="range"
             min="0"
             max="100"
             value={volume * 100}
             onChange={handleVolumeChange}
-            />
+          />
         </Header>
         <Visualization
           events={processedEvents}
           isOnline={isOnline}
         />
-        <BlobOuterContainer>
-            <BlobInnerContainer>
-                <Blob />
-            </BlobInnerContainer>
-        </BlobOuterContainer>
       </MainArea>
 
       <ConfigArea>
-        <FilterDiv>
+        <div className="filter-section">
           Enter your organization's or repository's names to filter events&nbsp;
-          <FilterInput
+          <input
             type="text"
             value={orgRepoFilter}
             onChange={handleFilterChange}
             placeholder="e.g. facebook react"
           />
-        </FilterDiv>
-        <SiteDescription>
+        </div>
+        <div className="description">
           <p>Track events happening across GitHub and convert them to music notes.</p>
-        </SiteDescription>
+        </div>
       </ConfigArea>
 
       <Footer>

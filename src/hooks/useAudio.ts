@@ -46,7 +46,7 @@ export const useAudio = (): UseAudioReturn => {
           ],
           volume: 0.7,
           onload: onSoundLoad,
-          onloaderror: (id, error) => console.error(`Failed to load celesta/${fn}:`, error),
+          onloaderror: (_id, error) => console.error(`Failed to load celesta/${fn}:`, error),
         }));
 
         clav.push(new Howl({
@@ -56,7 +56,7 @@ export const useAudio = (): UseAudioReturn => {
           ],
           volume: 0.4,
           onload: onSoundLoad,
-          onloaderror: (id, error) => console.error(`Failed to load clav/${fn}:`, error),
+          onloaderror: (_id, error) => console.error(`Failed to load clav/${fn}:`, error),
         }));
       }
 
@@ -69,7 +69,7 @@ export const useAudio = (): UseAudioReturn => {
           ],
           volume: 1,
           onload: onSoundLoad,
-          onloaderror: (id, error) => console.error(`Failed to load swells/swell${i}:`, error),
+          onloaderror: (_id, error) => console.error(`Failed to load swells/swell${i}:`, error),
         }));
       }
 
