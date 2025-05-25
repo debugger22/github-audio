@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useAudio } from './hooks/useAudio';
 import Visualization, { VisualizationRef } from './components/Visualization';
+import Visualization3D, { Visualization3DRef } from './components/Visualization3D';
+import VisualizationToggle from './components/VisualizationToggle';
 
 // Styled Components - Optimized to reduce DOM elements
 const AppContainer = styled.div`
@@ -181,9 +183,11 @@ const App: React.FC = () => {
     return savedVolume ? parseFloat(savedVolume) : 0.5;
   });
   const [orgRepoFilter, setOrgRepoFilter] = useState('');
+  const [is3DMode, setIs3DMode] = useState(false);
   const processedEventIdsRef = useRef<Set<string>>(new Set());
   const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const visualizationRef = useRef<VisualizationRef>(null);
+  const visualization3DRef = useRef<Visualization3DRef>(null);
 
   // Parse org/repo filter into array
   const orgRepoFilterArray = useMemo(() => {
@@ -216,8 +220,10 @@ const App: React.FC = () => {
         const size = nextEvent.actor.display_login.length * 1.1;
         playSound(size, nextEvent.type);
         
-        // Draw event immediately (matching original implementation)
-        if (visualizationRef.current) {
+        // Draw event in the appropriate visualization mode
+        if (is3DMode && visualization3DRef.current) {
+          visualization3DRef.current.drawEvent(nextEvent);
+        } else if (!is3DMode && visualizationRef.current) {
           visualizationRef.current.drawEvent(nextEvent);
         }
         
@@ -242,7 +248,7 @@ const App: React.FC = () => {
     // Schedule next processing cycle with original timing: 500-1500ms delay
     const delay = Math.floor(Math.random() * 1000) + 500;
     processingTimeoutRef.current = setTimeout(processNextEvent, delay);
-  }, [showClickToPlay, allSoundsLoaded, eventQueue, playSound]);
+  }, [showClickToPlay, allSoundsLoaded, eventQueue, playSound, is3DMode]);
 
   // Start the processing loop when conditions are met
   useEffect(() => {
@@ -286,6 +292,10 @@ const App: React.FC = () => {
     processedEventIdsRef.current.clear();
   };
 
+  const handleToggle3DMode = (newIs3D: boolean) => {
+    setIs3DMode(newIs3D);
+  };
+
   return (
     <AppContainer>
       <ClickToPlay $show={showClickToPlay}>
@@ -308,9 +318,16 @@ const App: React.FC = () => {
             onChange={handleVolumeChange}
           />
         </Header>
-        <Visualization
-          ref={visualizationRef}
-        />
+        {!is3DMode && (
+          <Visualization
+            ref={visualizationRef}
+          />
+        )}
+        {is3DMode && (
+          <Visualization3D
+            ref={visualization3DRef}
+          />
+        )}
       </MainArea>
 
       <ConfigArea>
@@ -350,6 +367,11 @@ const App: React.FC = () => {
             ProTip: It's actually kind of nice to leave on the background
           </span>
       </Footer>
+
+      <VisualizationToggle
+        is3D={is3DMode}
+        onToggle={handleToggle3DMode}
+      />
     </AppContainer>
   );
 };
