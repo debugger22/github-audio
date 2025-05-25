@@ -41,10 +41,10 @@ const Visualization3D = forwardRef<Visualization3DRef, Visualization3DProps>((_,
   const cameraControlsRef = useRef({
     phi: 0,
     theta: 0,
-    radius: 50,
+    radius: 100,
     targetPhi: 0,
     targetTheta: 0,
-    targetRadius: 50
+    targetRadius: 100
   });
 
   // Function to get event-specific color and settings
@@ -103,7 +103,7 @@ const Visualization3D = forwardRef<Visualization3DRef, Visualization3DProps>((_,
 
     // Camera
     const camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
-    camera.position.set(0, 0, 50);
+    camera.position.set(0, 0, 100);
     cameraRef.current = camera;
 
     // Renderer
@@ -323,7 +323,7 @@ const Visualization3D = forwardRef<Visualization3DRef, Visualization3DProps>((_,
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
       cameraControlsRef.current.targetRadius += event.deltaY * 0.1;
-      cameraControlsRef.current.targetRadius = Math.max(10, Math.min(200, cameraControlsRef.current.targetRadius));
+      cameraControlsRef.current.targetRadius = Math.max(20, Math.min(300, cameraControlsRef.current.targetRadius));
     };
 
     const handleClick = (event: MouseEvent) => {
@@ -393,7 +393,7 @@ const Visualization3D = forwardRef<Visualization3DRef, Visualization3DProps>((_,
       // Update spheres with gravitational pull
       spheresRef.current = spheresRef.current.filter(sphere => {
         const elapsed = now - sphere.startTime;
-        const maxLife = 20000;
+        const maxLife = 60000;
         const progress = elapsed / maxLife;
 
         if (progress >= 1) {
@@ -426,7 +426,7 @@ const Visualization3D = forwardRef<Visualization3DRef, Visualization3DProps>((_,
 
         // Maintain opacity until very close to the sun
         const opacityProgress = Math.max(0, 1 - Math.pow(progress, 3));
-        (sphere.mesh.material as THREE.MeshStandardMaterial).opacity = 0.8 * opacityProgress;
+        (sphere.mesh.material as THREE.MeshStandardMaterial).opacity = 1 * opacityProgress;
 
         return true;
       });
@@ -541,25 +541,30 @@ const Visualization3D = forwardRef<Visualization3DRef, Visualization3DProps>((_,
     const material = new THREE.MeshStandardMaterial({
       color: new THREE.Color(color),
       transparent: true,
-      opacity: 0.8,
+      opacity: 1,
       emissive: new THREE.Color(color),
-      emissiveIntensity: 0.2
+      emissiveIntensity: 0.5
     });
 
     const mesh = new THREE.Mesh(geometry, material);
     
-    // Position in 3D space
+    // Position spheres at the edge of the visible screen area
+    // Use a distance range (80-120 units) to start them at screen edge
+    const distance = 80 + seededRandom1 * 40; // Distance between 80-120 units
+    const theta = seededRandom2 * Math.PI * 2; // Random angle around Y axis
+    const phi = seededRandom3 * Math.PI; // Random angle for vertical distribution
+    
     mesh.position.set(
-      (seededRandom1 - 0.5) * 80,
-      (seededRandom2 - 0.5) * 60,
-      (seededRandom3 - 0.5) * 40
+      distance * Math.sin(phi) * Math.cos(theta),
+      distance * Math.cos(phi),
+      distance * Math.sin(phi) * Math.sin(theta)
     );
 
-    // Random velocity for gentle movement
+    // Random velocity for gentle movement (reduced since they start farther)
     const velocity = new THREE.Vector3(
-      (Math.random() - 0.5) * 0.01,
-      (Math.random() - 0.5) * 0.008,
-      (Math.random() - 0.5) * 0.005
+      (Math.random() - 0.5) * 0.005,
+      (Math.random() - 0.5) * 0.004,
+      (Math.random() - 0.5) * 0.003
     );
 
     sceneRef.current.add(mesh);
