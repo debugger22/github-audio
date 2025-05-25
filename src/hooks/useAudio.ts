@@ -41,7 +41,7 @@ export const useAudio = (): UseAudioReturn => {
         
         celesta.push(new Howl({
           src: [
-            `/sounds/celesta/${fn}.ogg`,
+            // `/sounds/celesta/${fn}.ogg`,
             `/sounds/celesta/${fn}.mp3`
           ],
           volume: 0.7,
@@ -51,7 +51,7 @@ export const useAudio = (): UseAudioReturn => {
 
         clav.push(new Howl({
           src: [
-            `/sounds/clav/${fn}.ogg`,
+            // `/sounds/clav/${fn}.ogg`,
             `/sounds/clav/${fn}.mp3`
           ],
           volume: 0.4,
@@ -64,7 +64,7 @@ export const useAudio = (): UseAudioReturn => {
       for (let i = 1; i <= 3; i++) {
         swells.push(new Howl({
           src: [
-            `/sounds/swells/swell${i}.ogg`,
+            // `/sounds/swells/swell${i}.ogg`,
             `/sounds/swells/swell${i}.mp3`
           ],
           volume: 1,
