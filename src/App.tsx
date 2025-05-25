@@ -1,8 +1,15 @@
-import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback, Suspense } from 'react';
 import styled from 'styled-components';
 import { useWebSocket } from './hooks/useWebSocket';
 import { useAudio } from './hooks/useAudio';
 import Visualization, { VisualizationRef } from './components/Visualization';
+import VisualizationToggle from './components/VisualizationToggle';
+
+// Lazy load the 3D visualization component
+const Visualization3D = React.lazy(() => import('./components/Visualization3D'));
+
+// Import the type separately for TypeScript
+import type { Visualization3DRef } from './components/Visualization3D';
 
 // Styled Components - Optimized to reduce DOM elements
 const AppContainer = styled.div`
@@ -174,6 +181,154 @@ const Footer = styled.footer`
   gap: 10px;
 `;
 
+// Beautiful 3D Loading Fallback UI
+const LoadingContainer = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+`;
+
+const LoadingContent = styled.div`
+  text-align: center;
+  color: white;
+  font-family: 'Inter', sans-serif;
+`;
+
+const LoadingTitle = styled.h2`
+  font-size: 2.5rem;
+  font-weight: 300;
+  margin-bottom: 1rem;
+  background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s ease-in-out infinite;
+  
+  @keyframes gradientShift {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+`;
+
+const LoadingSubtitle = styled.p`
+  font-size: 1.1rem;
+  color: #a0a0a0;
+  margin-bottom: 3rem;
+  font-weight: 300;
+`;
+
+const LoadingSpinner = styled.div`
+  position: relative;
+  width: 80px;
+  height: 80px;
+  margin: 0 auto 2rem;
+`;
+
+const SpinnerRing = styled.div<{ delay?: number }>`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border: 2px solid transparent;
+  border-top: 2px solid #4ecdc4;
+  border-radius: 50%;
+  animation: spin 2s linear infinite;
+  animation-delay: ${props => props.delay || 0}s;
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+`;
+
+const SpinnerCore = styled.div`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  background: radial-gradient(circle, #ff6b6b, #4ecdc4);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulse 1.5s ease-in-out infinite;
+  
+  @keyframes pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.5); opacity: 0.7; }
+  }
+`;
+
+const LoadingStars = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+  
+  &::before {
+    top: 20%;
+    left: 15%;
+    animation-delay: 0s;
+  }
+  
+  &::after {
+    top: 70%;
+    right: 20%;
+    animation-delay: 1.5s;
+  }
+  
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.5); }
+  }
+`;
+
+const LoadingProgress = styled.div`
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 300;
+  animation: fadeInOut 2s ease-in-out infinite;
+  
+  @keyframes fadeInOut {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+`;
+
+// Loading Fallback Component
+const Loading3DFallback: React.FC = () => (
+  <LoadingContainer>
+    <LoadingStars />
+    <LoadingContent>
+      <LoadingTitle>Initializing 3D Universe</LoadingTitle>
+      <LoadingSubtitle>Preparing cosmic visualization...</LoadingSubtitle>
+      <LoadingSpinner>
+        <SpinnerRing />
+        <SpinnerRing delay={0.5} />
+        <SpinnerCore />
+      </LoadingSpinner>
+      <LoadingProgress>Loading Three.js components</LoadingProgress>
+    </LoadingContent>
+  </LoadingContainer>
+);
+
 const App: React.FC = () => {
   const [showClickToPlay, setShowClickToPlay] = useState(true);
   const [volume, setVolumeState] = useState(() => {
@@ -181,9 +336,11 @@ const App: React.FC = () => {
     return savedVolume ? parseFloat(savedVolume) : 0.5;
   });
   const [orgRepoFilter, setOrgRepoFilter] = useState('');
+  const [is3DMode, setIs3DMode] = useState(false);
   const processedEventIdsRef = useRef<Set<string>>(new Set());
   const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const visualizationRef = useRef<VisualizationRef>(null);
+  const visualization3DRef = useRef<Visualization3DRef>(null);
 
   // Parse org/repo filter into array
   const orgRepoFilterArray = useMemo(() => {
@@ -216,8 +373,10 @@ const App: React.FC = () => {
         const size = nextEvent.actor.display_login.length * 1.1;
         playSound(size, nextEvent.type);
         
-        // Draw event immediately (matching original implementation)
-        if (visualizationRef.current) {
+        // Draw event in the appropriate visualization mode
+        if (is3DMode && visualization3DRef.current) {
+          visualization3DRef.current.drawEvent(nextEvent);
+        } else if (!is3DMode && visualizationRef.current) {
           visualizationRef.current.drawEvent(nextEvent);
         }
         
@@ -242,7 +401,7 @@ const App: React.FC = () => {
     // Schedule next processing cycle with original timing: 500-1500ms delay
     const delay = Math.floor(Math.random() * 1000) + 500;
     processingTimeoutRef.current = setTimeout(processNextEvent, delay);
-  }, [showClickToPlay, allSoundsLoaded, eventQueue, playSound]);
+  }, [showClickToPlay, allSoundsLoaded, eventQueue, playSound, is3DMode]);
 
   // Start the processing loop when conditions are met
   useEffect(() => {
@@ -286,6 +445,10 @@ const App: React.FC = () => {
     processedEventIdsRef.current.clear();
   };
 
+  const handleToggle3DMode = (newIs3D: boolean) => {
+    setIs3DMode(newIs3D);
+  };
+
   return (
     <AppContainer>
       <ClickToPlay $show={showClickToPlay}>
@@ -308,9 +471,18 @@ const App: React.FC = () => {
             onChange={handleVolumeChange}
           />
         </Header>
-        <Visualization
-          ref={visualizationRef}
-        />
+        {!is3DMode && (
+          <Visualization
+            ref={visualizationRef}
+          />
+        )}
+        {is3DMode && (
+          <Suspense fallback={<Loading3DFallback />}>
+            <Visualization3D
+              ref={visualization3DRef}
+            />
+          </Suspense>
+        )}
       </MainArea>
 
       <ConfigArea>
@@ -350,6 +522,11 @@ const App: React.FC = () => {
             ProTip: It's actually kind of nice to leave on the background
           </span>
       </Footer>
+
+      <VisualizationToggle
+        is3D={is3DMode}
+        onToggle={handleToggle3DMode}
+      />
     </AppContainer>
   );
 };
