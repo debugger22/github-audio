@@ -293,6 +293,7 @@ const App: React.FC = () => {
           src="/images/play-button.svg"
           alt="Click to play"
           onClick={handlePlayButtonClick}
+          fetchPriority="high"
         />
       </ClickToPlay>
 
@@ -333,6 +334,7 @@ const App: React.FC = () => {
             alt="GitHub Audio Logo"
             width={60}
             height={60}
+            fetchPriority="high"
           />
           <span>This project is not in any way affiliated with GitHub.</span>
           <span>
