@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import styled from 'styled-components';
 import { useWebSocket, GitHubEvent } from './hooks/useWebSocket';
 import { useAudio } from './hooks/useAudio';
@@ -98,7 +98,6 @@ const MainArea = styled.div<{ $isOnline: boolean }>`
     filter: blur(100px);
     border-radius: 99999px;
     margin: auto;
-    transform: scale(0.8);
     background: conic-gradient(
       from 0deg,
       #90D1CA 0%,
@@ -182,8 +181,8 @@ const App: React.FC = () => {
   const [volume, setVolumeState] = useState(0.5);
   const [orgRepoFilter, setOrgRepoFilter] = useState('');
   const [processedEvents, setProcessedEvents] = useState<GitHubEvent[]>([]);
-  const processedCountRef = useRef(0);
-  const eventQueueRef = useRef<GitHubEvent[]>([]);
+  const processedEventIdsRef = useRef<Set<string>>(new Set());
+  const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Parse org/repo filter into array
   const orgRepoFilterArray = useMemo(() => {
@@ -198,47 +197,76 @@ const App: React.FC = () => {
 
   const { allSoundsLoaded, playSound, setVolume } = useAudio();
 
-  // Update eventQueue ref whenever eventQueue changes
-  useEffect(() => {
-    eventQueueRef.current = eventQueue;
-  }, [eventQueue]);
+  // Process events one at a time with proper delays (matching original implementation)
+  const processNextEvent = useCallback(() => {
+    if (!showClickToPlay && allSoundsLoaded && eventQueue.length > 0) {
+      // Find the next unprocessed event using event_url as unique identifier
+      const nextEvent = eventQueue.find(event => 
+        event.event_url && !processedEventIdsRef.current.has(event.event_url)
+      );
+      
+      if (nextEvent && nextEvent.actor?.display_login && nextEvent.event_url) {
+        console.log(`Processing event: ${nextEvent.type} by ${nextEvent.actor.display_login} (URL: ${nextEvent.event_url.slice(-8)})`);
+        
+        // Mark as processed immediately
+        processedEventIdsRef.current.add(nextEvent.event_url);
+        
+        // Play sound and add to visualization
+        const size = nextEvent.actor.display_login.length * 1.1;
+        playSound(size, nextEvent.type);
+        setProcessedEvents(prev => {
+          const newEvents = [...prev, nextEvent];
+          // Keep only the last 100 processed events to prevent memory issues
+          return newEvents.slice(-100);
+        });
+        
+        console.log(`Processed count: ${processedEventIdsRef.current.size}, Queue length: ${eventQueue.length}`);
+      } else if (eventQueue.length > 0) {
+        console.log(`No new events to process (queue: ${eventQueue.length}, processed: ${processedEventIdsRef.current.size})`);
+      }
+      
+      // Clean up the processed IDs set if it gets too large
+      if (processedEventIdsRef.current.size > 200) {
+        console.log(`Cleaning up processed URLs set (was ${processedEventIdsRef.current.size})`);
+        // Keep only the most recent event URLs from the current queue
+        const recentUrls = new Set<string>();
+        eventQueue.slice(-100).forEach(event => {
+          if (event.event_url) recentUrls.add(event.event_url);
+        });
+        processedEventIdsRef.current = recentUrls;
+        console.log(`Cleaned up to ${processedEventIdsRef.current.size} URLs`);
+      }
+    }
+    
+    // Schedule next processing cycle with original timing: 500-1500ms delay
+    const delay = Math.floor(Math.random() * 1000) + 500;
+    processingTimeoutRef.current = setTimeout(processNextEvent, delay);
+  }, [showClickToPlay, allSoundsLoaded, eventQueue, playSound]);
 
-  // Process events from queue
+  // Start the processing loop when conditions are met
   useEffect(() => {
     if (!showClickToPlay && allSoundsLoaded) {
-      let isProcessing = true;
+      // Clear any existing timeout
+      if (processingTimeoutRef.current) {
+        clearTimeout(processingTimeoutRef.current);
+      }
       
-      const playFromQueue = () => {
-        if (!isProcessing) return;
-        
-        // Get next unprocessed event from queue using ref
-        if (processedCountRef.current < eventQueueRef.current.length) {
-          const event = eventQueueRef.current[processedCountRef.current];
-          processedCountRef.current++;
-          
-          if (event && event.actor?.display_login) {
-            const size = event.actor.display_login.length * 1.1;
-            playSound(size, event.type);
-            setProcessedEvents(prev => [...prev, event]);
-          }
-        }
-        
-        // Schedule next processing with random delay (500-1500ms)
-        setTimeout(playFromQueue, Math.floor(Math.random() * 1000) + 500);
-      };
-      
-      // Start processing after initial random delay
-      setTimeout(playFromQueue, Math.floor(Math.random() * 1000));
+      // Start processing with initial delay
+      const initialDelay = Math.floor(Math.random() * 1000) + 500;
+      processingTimeoutRef.current = setTimeout(processNextEvent, initialDelay);
       
       return () => {
-        isProcessing = false;
+        if (processingTimeoutRef.current) {
+          clearTimeout(processingTimeoutRef.current);
+        }
       };
     }
-  }, [showClickToPlay, allSoundsLoaded, playSound]);
+  }, [showClickToPlay, allSoundsLoaded, processNextEvent]);
 
-  // Reset processed count when filter changes
+  // Clear processed events when filter changes
   useEffect(() => {
-    processedCountRef.current = 0;
+    setProcessedEvents([]);
+    processedEventIdsRef.current.clear();
   }, [orgRepoFilter]);
 
   const handlePlayButtonClick = () => {
