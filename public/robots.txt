@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+
+# Allow crawling of all content
+Disallow:
+
+# Sitemap location
+Sitemap: https://github.audio/sitemap.xml
+
+# Crawl delay (optional - helps prevent overwhelming the server)
+Crawl-delay: 1 
