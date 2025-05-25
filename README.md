@@ -15,7 +15,7 @@ GitHub Audio listens to events happening across GitHub and converts them into mu
   - Random swell sounds for ambiance
 - **Dual Visualization Modes**: 
   - **2D Mode**: D3.js powered animations with colored circles for each event
-  - **3D Mode**: Three.js powered 3D space with colorful floating spheres, a realistic fireball sun, and gravitational effects
+  - **3D Mode**: Three.js powered 3D space with colorful floating spheres, a realistic fireball sun, gravitational effects, and a stunning starfield with 10,000 realistically twinkling stars
 - **Interactive 3D Experience**: Orbit controls for zooming, panning, and rotating the 3D scene with realistic gravitational pull animations
 - **Event Filtering**: Filter events by organization or repository name
 - **Volume Control**: Adjustable audio volume

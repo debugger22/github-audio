@@ -21,6 +21,15 @@ interface EventSphere {
   startTime: number;
 }
 
+interface ShootingStar {
+  id: string;
+  line: THREE.Mesh;
+  startTime: number;
+  startPosition: THREE.Vector3;
+  endPosition: THREE.Vector3;
+  duration: number;
+}
+
 interface Visualization3DProps {
   // No props needed since we're using ref-based drawing
 }
@@ -35,6 +44,7 @@ const Visualization3D = forwardRef<Visualization3DRef, Visualization3DProps>((_,
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const spheresRef = useRef<EventSphere[]>([]);
+  const shootingStarsRef = useRef<ShootingStar[]>([]);
   const animationIdRef = useRef<number | null>(null);
   const mouseRef = useRef({ x: 0, y: 0 });
   const isMouseDownRef = useRef(false);
@@ -87,6 +97,76 @@ const Visualization3D = forwardRef<Visualization3DRef, Visualization3DProps>((_,
     }
     
     return { color, size };
+  }, []);
+
+  // Function to create a shooting star with trail
+  const createShootingStar = useCallback(() => {
+    if (!sceneRef.current) return;
+
+    // Create shooting star closer to the camera (distance 150-250)
+    const distance = 150 + Math.random() * 100;
+    const startTheta = Math.random() * Math.PI * 2;
+    const startPhi = Math.random() * Math.PI;
+    
+    const startPosition = new THREE.Vector3(
+      distance * Math.sin(startPhi) * Math.cos(startTheta),
+      distance * Math.cos(startPhi),
+      distance * Math.sin(startPhi) * Math.sin(startTheta)
+    );
+
+    // Create end position for the trail (50-100 units away from start)
+    const trailLength = 50 + Math.random() * 50;
+    const direction = new THREE.Vector3(
+      (Math.random() - 0.5) * 2,
+      (Math.random() - 0.5) * 2,
+      (Math.random() - 0.5) * 2
+    ).normalize();
+    
+    const endPosition = startPosition.clone().add(direction.multiplyScalar(trailLength));
+
+    // Create a bright head sphere for the shooting star
+    const headGeometry = new THREE.SphereGeometry(0.5, 8, 8);
+    const headMaterial = new THREE.MeshBasicMaterial({
+      color: 0xFFFFFF,
+      transparent: true,
+      opacity: 1.0
+    });
+    const head = new THREE.Mesh(headGeometry, headMaterial);
+    head.position.copy(startPosition);
+    sceneRef.current.add(head);
+
+    // Create trail using multiple small spheres for better visibility
+    const trailSpheres: THREE.Mesh[] = [];
+    const numTrailPoints = 15;
+    
+    for (let i = 0; i < numTrailPoints; i++) {
+      const progress = i / (numTrailPoints - 1);
+      const trailGeometry = new THREE.SphereGeometry(0.2 * (1 - progress * 0.8), 6, 6);
+      const opacity = (1 - progress) * 0.8;
+      const trailMaterial = new THREE.MeshBasicMaterial({
+        color: 0xFFFFFF,
+        transparent: true,
+        opacity: opacity
+      });
+      const trailSphere = new THREE.Mesh(trailGeometry, trailMaterial);
+      trailSphere.position.copy(startPosition);
+      sceneRef.current.add(trailSphere);
+      trailSpheres.push(trailSphere);
+    }
+
+    const shootingStar: ShootingStar = {
+      id: `shooting-star-${Date.now()}-${Math.random()}`,
+      line: head, // Store the head mesh
+      startTime: Date.now(),
+      startPosition: startPosition.clone(),
+      endPosition: endPosition.clone(),
+      duration: 5000 // 5 seconds
+    };
+
+    // Store trail spheres in userData for cleanup
+    shootingStar.line.userData = { trailSpheres, head };
+
+    shootingStarsRef.current.push(shootingStar);
   }, []);
 
   // Initialize Three.js scene
@@ -190,7 +270,7 @@ const Visualization3D = forwardRef<Visualization3DRef, Visualization3DProps>((_,
     // Create realistic starfield like the solar system project
     const createStarfield = () => {
       const starGeometry = new THREE.BufferGeometry();
-      const starCount = 10000;
+      const starCount = 4000;
       
       const positions = new Float32Array(starCount * 3);
       const colors = new Float32Array(starCount * 3);
@@ -479,6 +559,60 @@ const Visualization3D = forwardRef<Visualization3DRef, Visualization3DProps>((_,
       stars.geometry.attributes.size.needsUpdate = true;
       stars.geometry.attributes.color.needsUpdate = true;
 
+      // Randomly create shooting stars (about every 3-8 seconds)
+      if (Math.random() < 0.002) { // Increased probability for testing (roughly every 8 seconds)
+        createShootingStar();
+      }
+
+      // Update and cleanup shooting stars
+      shootingStarsRef.current = shootingStarsRef.current.filter(star => {
+        const elapsed = now - star.startTime;
+        const progress = elapsed / star.duration;
+
+        if (progress >= 1) {
+          // Remove completed shooting star
+          const { trailSpheres, head } = star.line.userData;
+          scene.remove(head);
+          head.geometry.dispose();
+          head.material.dispose();
+          
+          trailSpheres.forEach((sphere: THREE.Mesh) => {
+            if (sceneRef.current) {
+              sceneRef.current.remove(sphere);
+            }
+            sphere.geometry.dispose();
+            (sphere.material as THREE.Material).dispose();
+          });
+          return false;
+        }
+
+        // Animate shooting star movement
+        const currentPosition = star.startPosition.clone().lerp(star.endPosition, progress);
+        const { trailSpheres, head } = star.line.userData;
+        
+        // Update head position
+        head.position.copy(currentPosition);
+        
+        // Update head opacity
+        const fadeProgress = Math.min(1, progress * 1.5);
+        const headOpacity = Math.max(0, 1 - fadeProgress);
+        (head.material as THREE.MeshBasicMaterial).opacity = headOpacity;
+
+        // Update trail spheres with staggered positions
+        trailSpheres.forEach((sphere: THREE.Mesh, index: number) => {
+          const trailProgress = Math.max(0, progress - (index * 0.05)); // Staggered trail
+          const trailPosition = star.startPosition.clone().lerp(star.endPosition, trailProgress);
+          sphere.position.copy(trailPosition);
+          
+          // Update trail opacity
+          const baseOpacity = (1 - index / trailSpheres.length) * 0.8;
+          const trailFade = Math.max(0, 1 - progress * 1.2);
+          (sphere.material as THREE.MeshBasicMaterial).opacity = baseOpacity * trailFade;
+        });
+
+        return true;
+      });
+
       renderer.render(scene, camera);
       animationIdRef.current = requestAnimationFrame(animate);
     };
@@ -501,6 +635,25 @@ const Visualization3D = forwardRef<Visualization3DRef, Visualization3DProps>((_,
       if (animationIdRef.current) {
         cancelAnimationFrame(animationIdRef.current);
       }
+      
+      // Cleanup shooting stars
+      shootingStarsRef.current.forEach(star => {
+        if (sceneRef.current) {
+          const { trailSpheres, head } = star.line.userData;
+          sceneRef.current.remove(head);
+          head.geometry.dispose();
+          head.material.dispose();
+          
+          trailSpheres.forEach((sphere: THREE.Mesh) => {
+            if (sceneRef.current) {
+              sceneRef.current.remove(sphere);
+            }
+            sphere.geometry.dispose();
+            (sphere.material as THREE.Material).dispose();
+          });
+        }
+      });
+      shootingStarsRef.current = [];
       
       renderer.domElement.removeEventListener('mousedown', handleMouseDown);
       renderer.domElement.removeEventListener('mousemove', handleMouseMove);
