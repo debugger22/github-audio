@@ -187,18 +187,112 @@ const Visualization3D = forwardRef<Visualization3DRef, Visualization3DProps>((_,
     sunLight.position.set(0, 0, 0);
     scene.add(sunLight);
 
-    // Stars
-    const starsGeometry = new THREE.BufferGeometry();
-    const starsCount = 5000;
-    const starsPositions = new Float32Array(starsCount * 3);
+    // Create realistic starfield like the solar system project
+    const createStarfield = () => {
+      const starGeometry = new THREE.BufferGeometry();
+      const starCount = 10000;
+      
+      const positions = new Float32Array(starCount * 3);
+      const colors = new Float32Array(starCount * 3);
+      const originalColors = new Float32Array(starCount * 3); // Store original colors
+      const sizes = new Float32Array(starCount);
+      const originalSizes = new Float32Array(starCount); // Store original sizes for twinkling
+      const twinkleFrequencies = new Float32Array(starCount); // Individual twinkling speeds
+      const twinklePhases = new Float32Array(starCount); // Phase offsets for variety
+      const twinkleIntensities = new Float32Array(starCount); // How much each star twinkles
+      
+      // Create star colors and positions
+      for (let i = 0; i < starCount; i++) {
+        // Random spherical distribution
+        const radius = 400 + Math.random() * 200;
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        
+        positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+        positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+        positions[i * 3 + 2] = radius * Math.cos(phi);
+        
+        // Varied star colors (white, blue-white, yellow-white, red)
+        const starType = Math.random();
+        let r, g, b;
+        if (starType < 0.7) {
+          // White stars (most common)
+          r = g = b = 1;
+        } else if (starType < 0.85) {
+          // Blue-white stars
+          r = 0.8; g = 0.9; b = 1;
+        } else if (starType < 0.95) {
+          // Yellow-white stars
+          r = 1; g = 1; b = 0.8;
+        } else {
+          // Red stars
+          r = 1; g = 0.7; b = 0.6;
+        }
+        
+        colors[i * 3] = r;
+        colors[i * 3 + 1] = g;
+        colors[i * 3 + 2] = b;
+        
+        // Store original colors
+        originalColors[i * 3] = r;
+        originalColors[i * 3 + 1] = g;
+        originalColors[i * 3 + 2] = b;
+        
+        // Varied star sizes with realistic distribution
+        const brightness = Math.random();
+        let starSize;
+        if (brightness < 0.8) {
+          starSize = 0.5 + Math.random() * 1; // Small stars
+        } else if (brightness < 0.95) {
+          starSize = 1.5 + Math.random() * 2; // Medium stars
+        } else {
+          starSize = 3 + Math.random() * 3; // Bright stars
+        }
+        
+        sizes[i] = starSize;
+        originalSizes[i] = starSize; // Store original size
+        
+        // Twinkling properties for more realistic effect
+        twinkleFrequencies[i] = 0.5 + Math.random() * 2; // Varied twinkling speeds (0.5-2.5)
+        twinklePhases[i] = Math.random() * Math.PI * 2; // Random phase offset
+        
+        // Larger stars twinkle more noticeably
+        if (starSize > 3) {
+          twinkleIntensities[i] = 0.4 + Math.random() * 0.4; // Bright stars twinkle more (0.4-0.8)
+        } else if (starSize > 1.5) {
+          twinkleIntensities[i] = 0.2 + Math.random() * 0.3; // Medium stars (0.2-0.5)
+        } else {
+          twinkleIntensities[i] = 0.1 + Math.random() * 0.2; // Small stars twinkle less (0.1-0.3)
+        }
+      }
+      
+      starGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      starGeometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+      starGeometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+      
+      // Create star material with proper blending
+      const starMaterial = new THREE.PointsMaterial({
+        size: 2,
+        sizeAttenuation: true,
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.9,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+      });
+      
+      const starField = new THREE.Points(starGeometry, starMaterial);
+      starField.userData = { 
+        originalSizes,
+        originalColors,
+        twinkleFrequencies,
+        twinklePhases,
+        twinkleIntensities
+      }; // Store twinkling data
+      return starField;
+    };
     
-    for (let i = 0; i < starsCount * 3; i++) {
-      starsPositions[i] = (Math.random() - 0.5) * 600;
-    }
-    
-    starsGeometry.setAttribute('position', new THREE.BufferAttribute(starsPositions, 3));
-    const starsMaterial = new THREE.PointsMaterial({ color: 0xffffff, size: 1 });
-    const stars = new THREE.Points(starsGeometry, starsMaterial);
+    const stars = createStarfield();
     scene.add(stars);
 
     // Mouse controls
@@ -337,8 +431,53 @@ const Visualization3D = forwardRef<Visualization3DRef, Visualization3DProps>((_,
         return true;
       });
 
-      // Rotate stars slowly
-      stars.rotation.y += 0.0005;
+      // Animate stars with enhanced twinkling and rotation
+      stars.rotation.y += 0.0002;
+      stars.rotation.x += 0.0001;
+      
+      // Enhanced star twinkling effect
+      const starSizes = stars.geometry.attributes.size.array;
+      const starColors = stars.geometry.attributes.color.array;
+      const { originalSizes, originalColors, twinkleFrequencies, twinklePhases, twinkleIntensities } = stars.userData;
+      const time = now * 0.001;
+      
+      for (let i = 0; i < starSizes.length; i++) {
+        const baseSize = originalSizes[i];
+        const frequency = twinkleFrequencies[i];
+        const phase = twinklePhases[i];
+        const intensity = twinkleIntensities[i];
+        
+        // Multi-layered twinkling with different wave patterns
+        const primaryTwinkle = Math.sin(time * frequency + phase);
+        const secondaryTwinkle = Math.sin(time * frequency * 1.7 + phase * 0.3) * 0.5;
+        const tertiaryTwinkle = Math.sin(time * frequency * 0.3 + phase * 1.8) * 0.3;
+        
+        // Combine waves for complex twinkling pattern
+        const combinedTwinkle = (primaryTwinkle + secondaryTwinkle + tertiaryTwinkle) / 1.8;
+        
+        // Apply size variation
+        const sizeMultiplier = 1 + combinedTwinkle * intensity;
+        starSizes[i] = baseSize * Math.max(0.3, sizeMultiplier);
+        
+        // Add subtle color intensity variation for brighter stars
+        if (baseSize > 2) {
+          const colorIntensity = 1 + combinedTwinkle * intensity * 0.3;
+          const colorIndex = i * 3;
+          
+          // Get original color values
+          const originalR = originalColors[colorIndex];
+          const originalG = originalColors[colorIndex + 1];
+          const originalB = originalColors[colorIndex + 2];
+          
+          // Apply intensity variation while preserving color ratios
+          starColors[colorIndex] = Math.min(1, originalR * colorIntensity);
+          starColors[colorIndex + 1] = Math.min(1, originalG * colorIntensity);
+          starColors[colorIndex + 2] = Math.min(1, originalB * colorIntensity);
+        }
+      }
+      
+      stars.geometry.attributes.size.needsUpdate = true;
+      stars.geometry.attributes.color.needsUpdate = true;
 
       renderer.render(scene, camera);
       animationIdRef.current = requestAnimationFrame(animate);
