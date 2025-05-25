@@ -8,30 +8,15 @@ import Visualization from './components/Visualization';
 const AppContainer = styled.div`
   margin: 0;
   padding: 0;
-//   background: conic-gradient(from 0deg, #A4B465, #F3C623, #FE5D26, #FFE99A, #4B70F5);
-//   background-size: 400% 400%;
-//   animation: gradient 15s ease infinite;
   background-color: #000;
   font-family: 'Inter', sans-serif;
   font-weight: 400;
   font-size: 16px;
   overflow-x: hidden;
   min-height: 100vh;
-
-//   @keyframes gradient {
-//     0% {
-//       background-position: 0% 50%;
-//     }
-//     50% {
-//       background-position: 100% 50%;
-//     }
-//     100% {
-//       background-position: 0% 50%;
-//     }
-//   }
 `;
 
-const ClickToPlay = styled.div<{ show: boolean }>`
+const ClickToPlay = styled.div<{ $show: boolean }>`
   position: fixed;
   top: 0;
   left: 0;
@@ -40,7 +25,7 @@ const ClickToPlay = styled.div<{ show: boolean }>`
   width: 100%;
   height: 100%;
   text-align: center;
-  display: ${props => props.show ? 'flex' : 'none'};
+  display: ${props => props.$show ? 'flex' : 'none'};
   align-items: center;
   justify-content: center;
 `;
@@ -55,14 +40,14 @@ const PlayButton = styled.img`
   }
 `;
 
-const Header = styled.header<{ isOnline: boolean }>`
+const Header = styled.header<{ $isOnline: boolean }>`
   position: relative;
   width: 100%;
   height: 75px;
   color: #fff;
   font-family: 'Inter', sans-serif;
   padding: 20px;
-//   background-color: ${props => props.isOnline ? '#32746D' : '#E91E63'};
+  z-index: 1000;
   transition: background-color 0.3s ease;
 `;
 
@@ -73,16 +58,9 @@ const HeaderText = styled.h1`
   margin: 0;
 `;
 
-const OfflineText = styled.span<{ show: boolean }>`
+const OfflineText = styled.span<{ $show: boolean }>`
   font-size: 0.4em;
-  visibility: ${props => props.show ? 'visible' : 'hidden'};
-`;
-
-const EventsRemaining = styled.div`
-  float: right;
-  margin-right: 5%;
-  margin-top: 30px;
-  font-size: 0.8em;
+  visibility: ${props => props.$show ? 'visible' : 'hidden'};
 `;
 
 const VolumeSlider = styled.input`
@@ -99,14 +77,13 @@ const VolumeSlider = styled.input`
   }
 `;
 
-const MainArea = styled.div<{ isOnline: boolean }>`
+const MainArea = styled.div<{ $isOnline: boolean }>`
   width: 100%;
   position: relative;
-  min-height: calc(100vh - 175px);
+  min-height: 100vh;
   background-color: transparent;
   transition: background-color 0.3s ease;
   overflow: hidden;
-  filter: blur(100px);
 `;
 
 const BlobOuterContainer = styled.div`
@@ -115,7 +92,8 @@ const BlobOuterContainer = styled.div`
     position: absolute;
     top: 0;
     left: 0;
-    z-index: -1000;
+    z-index: 0;
+    filter: blur(100px);
 `;
 
 const BlobInnerContainer = styled.div`
@@ -135,30 +113,43 @@ const Blob = styled.div`
     height: 100%;
     inset: 0;
     margin: auto;
-    background: conic-gradient(from 0deg, #A4B465, #F3C623, #FE5D26, #FFE99A, #4B70F5);
-    animation: spinBlob 8s linear infinite;
+    background: conic-gradient(
+        from 0deg,
+        #90D1CA 0%,
+        #7BCDC1 10%,
+        #129990 20%,
+        #6C4E4E 30%,
+        #CB0404 40%,
+        #D93C1B 50%,
+        #FE5D26 60%,
+        #FF7F35 70%,
+        #FF9B45 80%,
+        #927AF5 90%,
+        #4B70F5 100%
+    );
+    animation: spinAndPulseBlob 30s cubic-bezier(0.77, 0, 0.175, 1) infinite,
+               fadeBlob 15s ease-in-out infinite;
 
-    @keyframes spinBlob {
+    @keyframes spinAndPulseBlob {
         0% {
-            transform: rotate(0deg) scale(2);
+            transform: rotate(0deg) scale(1.95);
         }
-
+        50% {
+            transform: rotate(180deg) scale(2.05);
+        }
         100% {
-            transform: rotate(1turn) scale(2);
+            transform: rotate(360deg) scale(1.95);
         }
     }
-`;
 
-const OnlineUsersDiv = styled.div`
-  text-align: center;
-  position: absolute;
-  bottom: 60px;
-  width: 100%;
-  margin: 0 auto;
-  font-size: 0.9em;
-  z-index: 1;
-  opacity: 0.5;
-  color: #fff;
+    @keyframes fadeBlob {
+        0%, 100% {
+            opacity: 0.85;
+        }
+        50% {
+            opacity: 1;
+        }
+    }
 `;
 
 const ConfigArea = styled.div`
@@ -280,7 +271,7 @@ const App: React.FC = () => {
 
   return (
     <AppContainer>
-      <ClickToPlay show={showClickToPlay}>
+      <ClickToPlay $show={showClickToPlay}>
         <PlayButton
           src="/images/play-button.svg"
           alt="Click to play"
@@ -288,24 +279,20 @@ const App: React.FC = () => {
         />
       </ClickToPlay>
 
-      <Header isOnline={isOnline}>
-        <HeaderText>
-          Project Audio for GitHub&nbsp;
-          <OfflineText show={!isOnline}>offline</OfflineText>
-        </HeaderText>
-        <EventsRemaining>
-          <span>{eventQueue.length} events remaining in queue</span>
-        </EventsRemaining>
-        <VolumeSlider
-          type="range"
-          min="0"
-          max="100"
-          value={volume * 100}
-          onChange={handleVolumeChange}
-        />
-      </Header>
-
-      <MainArea isOnline={isOnline}>
+      <MainArea $isOnline={isOnline}>
+        <Header $isOnline={isOnline}>
+            <HeaderText>
+            Project Audio for GitHub&nbsp;
+            <OfflineText $show={!isOnline}>offline</OfflineText>
+            </HeaderText>
+            <VolumeSlider
+            type="range"
+            min="0"
+            max="100"
+            value={volume * 100}
+            onChange={handleVolumeChange}
+            />
+        </Header>
         <Visualization
           events={processedEvents}
           isOnline={isOnline}
@@ -315,9 +302,6 @@ const App: React.FC = () => {
                 <Blob />
             </BlobInnerContainer>
         </BlobOuterContainer>
-        <OnlineUsersDiv>
-          <h2>GitHub Audio - Real-time Event Visualization</h2>
-        </OnlineUsersDiv>
       </MainArea>
 
       <ConfigArea>
