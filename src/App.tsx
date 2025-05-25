@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import styled from 'styled-components';
-import { useWebSocket, GitHubEvent } from './hooks/useWebSocket';
+import { useWebSocket } from './hooks/useWebSocket';
 import { useAudio } from './hooks/useAudio';
-import Visualization from './components/Visualization';
+import Visualization, { VisualizationRef } from './components/Visualization';
 
 // Styled Components - Optimized to reduce DOM elements
 const AppContainer = styled.div`
@@ -180,9 +180,9 @@ const App: React.FC = () => {
   const [showClickToPlay, setShowClickToPlay] = useState(true);
   const [volume, setVolumeState] = useState(0.5);
   const [orgRepoFilter, setOrgRepoFilter] = useState('');
-  const [processedEvents, setProcessedEvents] = useState<GitHubEvent[]>([]);
   const processedEventIdsRef = useRef<Set<string>>(new Set());
   const processingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const visualizationRef = useRef<VisualizationRef>(null);
 
   // Parse org/repo filter into array
   const orgRepoFilterArray = useMemo(() => {
@@ -211,14 +211,14 @@ const App: React.FC = () => {
         // Mark as processed immediately
         processedEventIdsRef.current.add(nextEvent.event_url);
         
-        // Play sound and add to visualization
+        // Play sound
         const size = nextEvent.actor.display_login.length * 1.1;
         playSound(size, nextEvent.type);
-        setProcessedEvents(prev => {
-          const newEvents = [...prev, nextEvent];
-          // Keep only the last 100 processed events to prevent memory issues
-          return newEvents.slice(-100);
-        });
+        
+        // Draw event immediately (matching original implementation)
+        if (visualizationRef.current) {
+          visualizationRef.current.drawEvent(nextEvent);
+        }
         
         console.log(`Processed count: ${processedEventIdsRef.current.size}, Queue length: ${eventQueue.length}`);
       } else if (eventQueue.length > 0) {
@@ -265,7 +265,6 @@ const App: React.FC = () => {
 
   // Clear processed events when filter changes
   useEffect(() => {
-    setProcessedEvents([]);
     processedEventIdsRef.current.clear();
   }, [orgRepoFilter]);
 
@@ -282,7 +281,7 @@ const App: React.FC = () => {
   const handleFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setOrgRepoFilter(e.target.value);
     clearEventQueue();
-    setProcessedEvents([]);
+    processedEventIdsRef.current.clear();
   };
 
   return (
@@ -310,8 +309,7 @@ const App: React.FC = () => {
           />
         </Header>
         <Visualization
-          events={processedEvents}
-          isOnline={isOnline}
+          ref={visualizationRef}
         />
       </MainArea>
 

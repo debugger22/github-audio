@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import { useEffect, useRef, useCallback, useImperativeHandle, forwardRef } from 'react';
 import * as d3 from 'd3';
 import styled from 'styled-components';
 import { GitHubEvent } from '../hooks/useWebSocket';
@@ -16,15 +16,15 @@ const SVGContainer = styled.svg`
 `;
 
 interface VisualizationProps {
-  events: GitHubEvent[];
-  isOnline: boolean;
+  // No props needed since we're using ref-based drawing
 }
 
-const Visualization: React.FC<VisualizationProps> = ({ 
-  events
-}) => {
+export interface VisualizationRef {
+  drawEvent: (event: GitHubEvent) => void;
+}
+
+const Visualization = forwardRef<VisualizationRef, VisualizationProps>((_, ref) => {
   const svgRef = useRef<SVGSVGElement>(null);
-  const processedCountRef = useRef(0);
 
   // Function to draw a single event immediately - optimized to reduce DOM elements
   const drawEvent = useCallback((event: GitHubEvent) => {
@@ -166,35 +166,20 @@ const Visualization: React.FC<VisualizationProps> = ({
       .duration(5000)
       .remove();
 
-    // More aggressive cleanup - keep fewer elements
+    // More aggressive cleanup - keep fewer elements (matching original: keep < 50)
     const allGroups = svg.selectAll('g');
-    if (allGroups.size() > 30) {
-      // Remove the first 15 oldest groups
-      allGroups.nodes().slice(0, 15).forEach(node => {
+    if (allGroups.size() > 50) {
+      // Remove the first 10 oldest groups (matching original cleanup pattern)
+      allGroups.nodes().slice(0, 10).forEach(node => {
         d3.select(node).remove();
       });
     }
   }, []);
 
-  // Draw new events as they arrive
-  useEffect(() => {
-    if (!svgRef.current) return;
-
-    // Set SVG dimensions
-    const svg = d3.select(svgRef.current);
-    const width = svgRef.current.clientWidth;
-    const height = svgRef.current.clientHeight;
-    svg.attr('width', width).attr('height', height);
-
-    // Draw only new events that haven't been processed yet
-    for (let i = processedCountRef.current; i < events.length; i++) {
-      const event = events[i];
-      drawEvent(event);
-    }
-    
-    // Update processed count
-    processedCountRef.current = events.length;
-  }, [events, drawEvent]);
+  // Expose drawEvent function to parent component
+  useImperativeHandle(ref, () => ({
+    drawEvent
+  }), [drawEvent]);
 
   // Handle window resize
   useEffect(() => {
@@ -210,9 +195,20 @@ const Visualization: React.FC<VisualizationProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Initialize SVG dimensions
+  useEffect(() => {
+    if (!svgRef.current) return;
+    const svg = d3.select(svgRef.current);
+    const width = svgRef.current.clientWidth;
+    const height = svgRef.current.clientHeight;
+    svg.attr('width', width).attr('height', height);
+  }, []);
+
   return (
     <SVGContainer ref={svgRef} />
   );
-};
+});
+
+Visualization.displayName = 'Visualization';
 
 export default Visualization; 
